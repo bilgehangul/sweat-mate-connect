@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import SessionCreator from '@/components/SessionCreator';
@@ -21,27 +22,30 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   const feedPosts = [
     {
       id: 1,
-      user: { name: 'Sarah Johnson', avatar: '👩‍🦰', level: 15 },
+      user: 'Sarah Johnson',
+      avatar: '👩‍🦰',
+      time: '2 hours ago',
       content: 'Just finished an amazing leg day! 💪 Who\'s ready to join me for some deadlifts tomorrow?',
-      media: { type: 'image', url: '/placeholder.svg' },
-      timestamp: '2 hours ago',
+      media: { type: 'image' as const, url: '/placeholder.svg' },
       likes: 24,
       comments: 8
     },
     {
       id: 2,
-      user: { name: 'Mike Chen', avatar: '👨‍💼', level: 22 },
+      user: 'Mike Chen',
+      avatar: '👨‍💼',
+      time: '4 hours ago',
       content: 'New PR on bench press today! 225lbs x 5 reps. The grind never stops! 🔥',
-      timestamp: '4 hours ago',
       likes: 31,
       comments: 12
     },
     {
       id: 3,
-      user: { name: 'Jessica Williams', avatar: '👩‍🦱', level: 18 },
+      user: 'Jessica Williams',
+      avatar: '👩‍🦱',
+      time: '6 hours ago',
       content: 'Morning yoga session complete! Starting the day with mindfulness and movement. 🧘‍♀️',
-      media: { type: 'video', url: '/placeholder.svg' },
-      timestamp: '6 hours ago',
+      media: { type: 'video' as const, url: '/placeholder.svg' },
       likes: 19,
       comments: 5
     }
@@ -120,7 +124,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
           {/* Right Sidebar - Gym Buddies */}
           <div className="lg:col-span-1">
-            <GymBuddiesList onChatClick={handleChatClick} />
+            <GymBuddiesList />
           </div>
         </div>
       </div>
@@ -129,7 +133,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       {showChat && selectedBuddy && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-background rounded-lg w-full max-w-md h-[600px] flex flex-col">
-            <Chat buddy={selectedBuddy} onClose={handleCloseChat} />
+            <Chat buddy={selectedBuddy} onClose={handleCloseChat} isOpen={showChat} />
           </div>
         </div>
       )}

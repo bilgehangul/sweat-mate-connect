@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Calendar, MapPin, MessageSquare, Poll, UserPlus } from 'lucide-react';
+import { Users, Calendar, MapPin, MessageSquare, BarChart3, UserPlus } from 'lucide-react';
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -72,9 +72,10 @@ const CommunityDetail = () => {
   const feedPosts = [
     {
       id: 1,
-      user: { name: 'Alex Rodriguez', avatar: '👨‍💼', level: 22 },
+      user: 'Alex Rodriguez',
+      avatar: '👨‍💼',
+      time: '2 hours ago',
       content: 'Great turnout at yesterday\'s WOD! Everyone crushed those burpees 💪',
-      timestamp: '2 hours ago',
       likes: 15,
       comments: 6
     }
@@ -204,7 +205,7 @@ const CommunityDetail = () => {
               {surveys.map((survey) => (
                 <Card key={survey.id} className="p-6">
                   <h3 className="text-xl font-bold mb-4 flex items-center">
-                    <Poll className="w-5 h-5 mr-2" />
+                    <BarChart3 className="w-5 h-5 mr-2" />
                     {survey.title}
                   </h3>
                   <div className="space-y-3">

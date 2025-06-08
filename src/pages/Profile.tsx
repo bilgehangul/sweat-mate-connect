@@ -50,18 +50,20 @@ const Profile = () => {
   const myFeedPosts = [
     {
       id: 1,
-      user: { name: 'John Doe', avatar: '👨‍💼', level: 23 },
+      user: 'John Doe',
+      avatar: '👨‍💼',
+      time: '1 day ago',
       content: 'Just hit a new PR on deadlifts! 405lbs for 3 reps. Feeling stronger every day 💪',
-      timestamp: '1 day ago',
       likes: 32,
       comments: 8
     },
     {
       id: 2,
-      user: { name: 'John Doe', avatar: '👨‍💼', level: 23 },
+      user: 'John Doe',
+      avatar: '👨‍💼',
+      time: '3 days ago',
       content: 'Morning cardio session complete! 5 miles in 35 minutes. Ready to tackle the day 🏃‍♂️',
-      media: { type: 'image', url: '/placeholder.svg' },
-      timestamp: '3 days ago',
+      media: { type: 'image' as const, url: '/placeholder.svg' },
       likes: 24,
       comments: 5
     }
