@@ -4,7 +4,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users } from 'lucide-react';
 
 const Signup = () => {
@@ -14,31 +13,33 @@ const Signup = () => {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    age: '',
-    gender: '',
-    fitnessLevel: ''
+    confirmPassword: ''
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    // Simulate signup
     console.log('Signup:', formData);
     navigate('/dashboard');
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-planet-purple to-jet-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg p-8 bg-pure-white shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-energy-orange to-jet-black flex items-center justify-center p-4">
+      <Card className="w-full max-w-md p-8 bg-pure-white shadow-2xl">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center mx-auto mb-4">
             <Users className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-planet-purple mb-2">Join GymBuddy!</h1>
-          <p className="text-muted-foreground">Start your fitness journey with a partner</p>
+          <h1 className="text-3xl font-bold text-energy-orange mb-2">Join GymBuddy!</h1>
+          <p className="text-muted-foreground">Create your account and start your fitness journey</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">
@@ -46,19 +47,25 @@ const Signup = () => {
             <div>
               <label className="block text-sm font-medium mb-2">First Name</label>
               <Input
+                type="text"
+                name="firstName"
                 value={formData.firstName}
-                onChange={(e) => handleInputChange('firstName', e.target.value)}
-                placeholder="First name"
+                onChange={handleInputChange}
+                placeholder="Enter first name"
                 required
+                className="w-full"
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Last Name</label>
               <Input
+                type="text"
+                name="lastName"
                 value={formData.lastName}
-                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                placeholder="Last name"
+                onChange={handleInputChange}
+                placeholder="Enter last name"
                 required
+                className="w-full"
               />
             </div>
           </div>
@@ -67,10 +74,12 @@ const Signup = () => {
             <label className="block text-sm font-medium mb-2">Email</label>
             <Input
               type="email"
+              name="email"
               value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
+              onChange={handleInputChange}
               placeholder="Enter your email"
               required
+              className="w-full"
             />
           </div>
 
@@ -78,10 +87,12 @@ const Signup = () => {
             <label className="block text-sm font-medium mb-2">Password</label>
             <Input
               type="password"
+              name="password"
               value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
+              onChange={handleInputChange}
               placeholder="Create a password"
               required
+              className="w-full"
             />
           </div>
 
@@ -89,58 +100,18 @@ const Signup = () => {
             <label className="block text-sm font-medium mb-2">Confirm Password</label>
             <Input
               type="password"
+              name="confirmPassword"
               value={formData.confirmPassword}
-              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+              onChange={handleInputChange}
               placeholder="Confirm your password"
               required
+              className="w-full"
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Age</label>
-              <Input
-                type="number"
-                value={formData.age}
-                onChange={(e) => handleInputChange('age', e.target.value)}
-                placeholder="Age"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Gender</label>
-              <Select onValueChange={(value) => handleInputChange('gender', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                  <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Fitness Level</label>
-            <Select onValueChange={(value) => handleInputChange('fitnessLevel', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select your fitness level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="beginner">Beginner</SelectItem>
-                <SelectItem value="intermediate">Intermediate</SelectItem>
-                <SelectItem value="advanced">Advanced</SelectItem>
-                <SelectItem value="expert">Expert</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <Button 
             type="submit" 
-            className="w-full planet-gradient text-white hover:scale-105 transition-transform pulse-energy"
+            className="w-full gym-gradient text-white hover:scale-105 transition-transform pulse-energy mt-6"
           >
             Create Account
           </Button>
@@ -149,7 +120,7 @@ const Signup = () => {
         <div className="mt-6 text-center">
           <p className="text-muted-foreground">
             Already have an account?{' '}
-            <Link to="/login" className="text-planet-purple hover:text-energy-yellow font-medium">
+            <Link to="/login" className="text-energy-orange hover:text-electric-blue font-medium">
               Sign in here
             </Link>
           </p>
@@ -158,7 +129,7 @@ const Signup = () => {
         <div className="mt-4 text-center">
           <Link 
             to="/" 
-            className="text-sm text-muted-foreground hover:text-planet-purple"
+            className="text-sm text-muted-foreground hover:text-energy-orange"
           >
             ← Back to home
           </Link>

@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Planet Fitness inspired design system */
+/* Updated color theme */
 
 @layer base {
   :root {
@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    --primary: 320 62% 35%;
+    --primary: 27 87% 67%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96.1%;
@@ -25,7 +25,7 @@
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
 
-    --accent: 59 97% 58%;
+    --accent: 200 98% 39%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84.2% 60.2%;
@@ -33,13 +33,14 @@
 
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 320 62% 35%;
+    --ring: 27 87% 67%;
 
     --radius: 0.75rem;
 
-    /* Planet Fitness theme colors */
-    --planet-purple: 320 62% 35%;
-    --energy-yellow: 59 97% 58%;
+    /* Updated theme colors */
+    --energy-orange: 27 87% 67%;
+    --electric-blue: 200 98% 39%;
+    --neon-green: 142 71% 45%;
     --jet-black: 0 0% 0%;
     --pure-white: 0 0% 100%;
   }
@@ -54,7 +55,7 @@
     --popover: 0 0% 0%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 320 62% 35%;
+    --primary: 27 87% 67%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 14.9%;
@@ -63,7 +64,7 @@
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
 
-    --accent: 59 97% 58%;
+    --accent: 200 98% 39%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 62.8% 30.6%;
@@ -71,7 +72,7 @@
 
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
-    --ring: 320 62% 35%;
+    --ring: 27 87% 67%;
   }
 }
 
@@ -86,12 +87,12 @@
 }
 
 @layer utilities {
-  .planet-gradient {
-    background: linear-gradient(135deg, hsl(var(--planet-purple)), hsl(var(--energy-yellow)));
+  .gym-gradient {
+    background: linear-gradient(135deg, hsl(var(--energy-orange)), hsl(var(--electric-blue)));
   }
   
   .energy-glow {
-    box-shadow: 0 0 20px hsl(var(--energy-yellow) / 0.5);
+    box-shadow: 0 0 20px hsl(var(--energy-orange) / 0.5);
   }
   
   .pulse-energy {

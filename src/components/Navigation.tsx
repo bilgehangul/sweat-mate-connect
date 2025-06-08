@@ -67,6 +67,7 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
     } else {
       navigate('/signup');
     }
+    setMobileMenuOpen(false);
   };
 
   const handleLoginClick = () => {
@@ -75,6 +76,7 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
     } else {
       navigate('/login');
     }
+    setMobileMenuOpen(false);
   };
 
   const handleLogoutClick = () => {
@@ -84,7 +86,7 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
   };
 
   return (
-    <nav className="bg-jet-black/95 backdrop-blur-sm border-b border-planet-purple/20 sticky top-0 z-50">
+    <nav className="bg-jet-black/95 backdrop-blur-sm border-b border-energy-orange/20 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -92,10 +94,10 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
             className="flex items-center space-x-2 cursor-pointer"
             onClick={handleLogoClick}
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-energy-orange to-electric-blue rounded-lg flex items-center justify-center">
               <Users className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent">
               GymBuddy
             </span>
           </div>
@@ -106,9 +108,9 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
               <button
                 key={tab.name}
                 onClick={() => handleTabClick(tab)}
-                className={`font-medium transition-colors hover:text-energy-yellow ${
+                className={`font-medium transition-colors hover:text-neon-green ${
                   activeTab === tab.path 
-                    ? 'text-energy-yellow border-b-2 border-energy-yellow' 
+                    ? 'text-neon-green border-b-2 border-neon-green' 
                     : 'text-pure-white'
                 }`}
               >
@@ -123,13 +125,13 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
               <Button 
                 variant="outline" 
                 onClick={handleLoginClick}
-                className="border-planet-purple text-planet-purple hover:bg-planet-purple hover:text-pure-white"
+                className="border-energy-orange text-energy-orange hover:bg-energy-orange hover:text-pure-white"
               >
                 Login
               </Button>
               <Button 
                 onClick={handleSignupClick}
-                className="planet-gradient text-white energy-glow hover:scale-105 transition-transform pulse-energy"
+                className="gym-gradient text-white energy-glow hover:scale-105 transition-transform pulse-energy"
               >
                 Sign Up
               </Button>
@@ -141,7 +143,7 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex items-center space-x-2 cursor-pointer">
-                    <div className="w-8 h-8 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full"></div>
+                    <div className="w-8 h-8 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full"></div>
                     <span className="font-medium text-pure-white">John Doe</span>
                   </div>
                 </DropdownMenuTrigger>
@@ -172,9 +174,9 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
                 <button
                   key={tab.name}
                   onClick={() => handleTabClick(tab)}
-                  className={`font-medium transition-colors hover:text-energy-yellow text-left ${
+                  className={`font-medium transition-colors hover:text-neon-green text-left ${
                     activeTab === tab.path 
-                      ? 'text-energy-yellow' 
+                      ? 'text-neon-green' 
                       : 'text-pure-white'
                   }`}
                 >
@@ -183,27 +185,27 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
               ))}
               
               {!isLoggedIn ? (
-                <div className="flex flex-col space-y-2 pt-4 border-t border-planet-purple/20">
+                <div className="flex flex-col space-y-2 pt-4 border-t border-energy-orange/20">
                   <Button 
                     variant="outline" 
                     onClick={handleLoginClick}
-                    className="border-planet-purple text-planet-purple hover:bg-planet-purple hover:text-pure-white"
+                    className="border-energy-orange text-energy-orange hover:bg-energy-orange hover:text-pure-white"
                   >
                     Login
                   </Button>
                   <Button 
                     onClick={handleSignupClick}
-                    className="planet-gradient text-white"
+                    className="gym-gradient text-white"
                   >
                     Sign Up
                   </Button>
                 </div>
               ) : (
-                <div className="pt-4 border-t border-planet-purple/20">
+                <div className="pt-4 border-t border-energy-orange/20">
                   <Button 
                     onClick={handleLogoutClick}
                     variant="outline"
-                    className="w-full border-planet-purple text-planet-purple hover:bg-planet-purple hover:text-pure-white"
+                    className="w-full border-energy-orange text-energy-orange hover:bg-energy-orange hover:text-pure-white"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout

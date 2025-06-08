@@ -53,8 +53,9 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				'planet-purple': 'hsl(var(--planet-purple))',
-				'energy-yellow': 'hsl(var(--energy-yellow))',
+				'energy-orange': 'hsl(var(--energy-orange))',
+				'electric-blue': 'hsl(var(--electric-blue))',
+				'neon-green': 'hsl(var(--neon-green))',
 				'jet-black': 'hsl(var(--jet-black))',
 				'pure-white': 'hsl(var(--pure-white))',
 			},

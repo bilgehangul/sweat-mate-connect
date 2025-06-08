@@ -19,13 +19,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-planet-purple to-jet-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-energy-orange to-jet-black flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8 bg-pure-white shadow-2xl">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center mx-auto mb-4">
             <Users className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-planet-purple mb-2">Welcome Back!</h1>
+          <h1 className="text-3xl font-bold text-energy-orange mb-2">Welcome Back!</h1>
           <p className="text-muted-foreground">Sign in to continue your fitness journey</p>
         </div>
 
@@ -56,7 +56,7 @@ const Login = () => {
 
           <Button 
             type="submit" 
-            className="w-full planet-gradient text-white hover:scale-105 transition-transform pulse-energy"
+            className="w-full gym-gradient text-white hover:scale-105 transition-transform pulse-energy"
           >
             Sign In
           </Button>
@@ -65,7 +65,7 @@ const Login = () => {
         <div className="mt-6 text-center">
           <p className="text-muted-foreground">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-planet-purple hover:text-energy-yellow font-medium">
+            <Link to="/signup" className="text-energy-orange hover:text-electric-blue font-medium">
               Sign up here
             </Link>
           </p>
@@ -74,7 +74,7 @@ const Login = () => {
         <div className="mt-4 text-center">
           <Link 
             to="/" 
-            className="text-sm text-muted-foreground hover:text-planet-purple"
+            className="text-sm text-muted-foreground hover:text-energy-orange"
           >
             ← Back to home
           </Link>
