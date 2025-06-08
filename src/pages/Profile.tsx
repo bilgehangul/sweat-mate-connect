@@ -1,13 +1,24 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
+import SessionCreator from '@/components/SessionCreator';
+import FeedPost from '@/components/FeedPost';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, MapPin, Target, Trophy, Edit, Settings } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar, MapPin, Target, Trophy, Edit, Settings, Plus, X } from 'lucide-react';
 
 const Profile = () => {
+  const navigate = useNavigate();
+  const [showSessionCreator, setShowSessionCreator] = useState(false);
+  
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   const [profile] = useState({
     name: 'John Doe',
     age: 29,
@@ -36,9 +47,57 @@ const Profile = () => {
     ]
   });
 
+  const myFeedPosts = [
+    {
+      id: 1,
+      user: { name: 'John Doe', avatar: '👨‍💼', level: 23 },
+      content: 'Just hit a new PR on deadlifts! 405lbs for 3 reps. Feeling stronger every day 💪',
+      timestamp: '1 day ago',
+      likes: 32,
+      comments: 8
+    },
+    {
+      id: 2,
+      user: { name: 'John Doe', avatar: '👨‍💼', level: 23 },
+      content: 'Morning cardio session complete! 5 miles in 35 minutes. Ready to tackle the day 🏃‍♂️',
+      media: { type: 'image', url: '/placeholder.svg' },
+      timestamp: '3 days ago',
+      likes: 24,
+      comments: 5
+    }
+  ];
+
+  const handleCreateSession = (sessionData: any) => {
+    console.log('Creating session:', sessionData);
+    setShowSessionCreator(false);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation isLoggedIn={true} />
+    <div className="min-h-screen bg-background relative">
+      <Navigation isLoggedIn={true} onLogout={handleLogout} />
+      
+      {/* Session Creator Modal */}
+      {showSessionCreator && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
+                  Create Your Workout Session
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSessionCreator(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <SessionCreator onCreateSession={handleCreateSession} />
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -49,7 +108,7 @@ const Profile = () => {
             {/* Profile Card */}
             <Card className="p-6 text-center">
               <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                <div className="w-24 h-24 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
                   {profile.avatar}
                 </div>
                 <Button size="sm" variant="outline" className="absolute top-0 right-0">
@@ -65,7 +124,7 @@ const Profile = () => {
               {/* Level & XP */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-neon-green">Level {profile.level}</span>
+                  <span className="font-semibold text-energy-yellow">Level {profile.level}</span>
                   <span className="text-sm text-muted-foreground">{profile.xp}/{profile.xpToNext} XP</span>
                 </div>
                 <Progress value={(profile.xp / profile.xpToNext) * 100} className="h-2" />
@@ -87,95 +146,120 @@ const Profile = () => {
 
             {/* Stats Card */}
             <Card className="p-6">
-              <h3 className="text-lg font-bold mb-4 text-center bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent">
+              <h3 className="text-lg font-bold mb-4 text-center bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
                 Fitness Stats
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Workouts</span>
-                  <span className="font-bold text-energy-orange">{profile.stats.workoutsCompleted}</span>
+                  <span className="font-bold text-planet-purple">{profile.stats.workoutsCompleted}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Hours Exercised</span>
-                  <span className="font-bold text-electric-blue">{profile.stats.hoursExercised}</span>
+                  <span className="font-bold text-planet-purple">{profile.stats.hoursExercised}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Gym Buddies</span>
-                  <span className="font-bold text-red-500">{profile.stats.favoriteBuddies}</span>
+                  <span className="font-bold text-planet-purple">{profile.stats.favoriteBuddies}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Communities</span>
-                  <span className="font-bold text-neon-green">{profile.stats.communitiesJoined}</span>
+                  <span className="font-bold text-planet-purple">{profile.stats.communitiesJoined}</span>
                 </div>
               </div>
             </Card>
+
+            {/* Create Session Button */}
+            <Button 
+              onClick={() => setShowSessionCreator(true)}
+              className="w-full planet-gradient text-white hover:scale-105 transition-transform"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Session
+            </Button>
           </div>
 
-          {/* Right Column - Details */}
-          <div className="lg:col-span-2 space-y-6">
-            
-            {/* Preferences & Goals */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="p-6">
-                <h3 className="text-lg font-bold mb-4 flex items-center">
-                  <Target className="w-5 h-5 mr-2 text-energy-orange" />
-                  Workout Goals
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {profile.workoutGoals.map((goal, index) => (
-                    <Badge key={index} variant="secondary" className="bg-energy-orange/10 text-energy-orange">
-                      {goal}
-                    </Badge>
-                  ))}
-                </div>
-              </Card>
+          {/* Right Column - Tabs */}
+          <div className="lg:col-span-2">
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="feed">My Feed</TabsTrigger>
+                <TabsTrigger value="workouts">Workouts</TabsTrigger>
+              </TabsList>
 
-              <Card className="p-6">
-                <h3 className="text-lg font-bold mb-4 flex items-center">
-                  <Trophy className="w-5 h-5 mr-2 text-electric-blue" />
-                  Preferences
-                </h3>
-                <div className="space-y-2">
-                  <p className="text-sm"><strong>Experience:</strong> {profile.experienceLevel}</p>
-                  <p className="text-sm"><strong>Favorite Gym:</strong> {profile.favoriteGym}</p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {profile.workoutPreferences.map((pref, index) => (
-                      <Badge key={index} variant="outline" className="border-electric-blue text-electric-blue">
-                        {pref}
-                      </Badge>
+              <TabsContent value="overview" className="space-y-6">
+                {/* Preferences & Goals */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center">
+                      <Target className="w-5 h-5 mr-2 text-planet-purple" />
+                      Workout Goals
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {profile.workoutGoals.map((goal, index) => (
+                        <Badge key={index} variant="secondary" className="bg-planet-purple/10 text-planet-purple">
+                          {goal}
+                        </Badge>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card className="p-6">
+                    <h3 className="text-lg font-bold mb-4 flex items-center">
+                      <Trophy className="w-5 h-5 mr-2 text-energy-yellow" />
+                      Preferences
+                    </h3>
+                    <div className="space-y-2">
+                      <p className="text-sm"><strong>Experience:</strong> {profile.experienceLevel}</p>
+                      <p className="text-sm"><strong>Favorite Gym:</strong> {profile.favoriteGym}</p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {profile.workoutPreferences.map((pref, index) => (
+                          <Badge key={index} variant="outline" className="border-energy-yellow text-energy-yellow">
+                            {pref}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-4">
+                  <Button className="flex-1 planet-gradient text-white hover:scale-105 transition-transform">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="feed" className="space-y-6">
+                {myFeedPosts.map((post) => (
+                  <FeedPost key={post.id} post={post} />
+                ))}
+              </TabsContent>
+
+              <TabsContent value="workouts" className="space-y-6">
+                <Card className="p-6">
+                  <h3 className="text-lg font-bold mb-4">Recent Workouts</h3>
+                  <div className="space-y-3">
+                    {profile.recentWorkouts.map((workout, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
+                        <div>
+                          <p className="font-medium">{workout.type}</p>
+                          <p className="text-sm text-muted-foreground">{workout.date} • {workout.gym}</p>
+                        </div>
+                        <Badge variant="outline">{workout.duration}</Badge>
+                      </div>
                     ))}
                   </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Recent Workouts */}
-            <Card className="p-6">
-              <h3 className="text-lg font-bold mb-4">Recent Workouts</h3>
-              <div className="space-y-3">
-                {profile.recentWorkouts.map((workout, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{workout.type}</p>
-                      <p className="text-sm text-muted-foreground">{workout.date} • {workout.gym}</p>
-                    </div>
-                    <Badge variant="outline">{workout.duration}</Badge>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-4">
-              <Button className="flex-1 gym-gradient text-white hover:scale-105 transition-transform">
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Profile
-              </Button>
-              <Button variant="outline" className="flex-1">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-            </div>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

@@ -1,94 +1,138 @@
-
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
-import UserStats from '@/components/UserStats';
 import SessionCreator from '@/components/SessionCreator';
 import GymBuddiesList from '@/components/GymBuddiesList';
 import FeedPost from '@/components/FeedPost';
+import UserStats from '@/components/UserStats';
+import Chat from '@/components/Chat';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { MessageCircle, X } from 'lucide-react';
 
-const Dashboard = () => {
-  const [posts] = useState([
+interface DashboardProps {
+  onLogout?: () => void;
+}
+
+const Dashboard = ({ onLogout }: DashboardProps) => {
+  const [showSessionCreator, setShowSessionCreator] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [selectedBuddy, setSelectedBuddy] = useState<any>(null);
+
+  const feedPosts = [
     {
       id: 1,
-      user: 'Sarah Chen',
-      avatar: '👩‍💼',
-      time: '2 hours ago',
-      content: 'Just crushed a deadlift PR! 225lbs 💪 Looking for someone to celebrate with tomorrow at Gold\'s Gym!',
-      workout: 'Strength Training - 90 minutes',
-      media: {
-        type: 'image' as const,
-        url: '/placeholder.svg'
-      },
-      likes: 12,
-      comments: 3,
-      isLiked: false
+      user: { name: 'Sarah Johnson', avatar: '👩‍🦰', level: 15 },
+      content: 'Just finished an amazing leg day! 💪 Who\'s ready to join me for some deadlifts tomorrow?',
+      media: { type: 'image', url: '/placeholder.svg' },
+      timestamp: '2 hours ago',
+      likes: 24,
+      comments: 8
     },
     {
       id: 2,
-      user: 'Mike Rodriguez',
-      avatar: '👨‍💼',
-      time: '4 hours ago',
-      content: 'Morning cardio session complete! The sunrise run was incredible. Who\'s up for a 6am session tomorrow?',
-      workout: 'Cardio - 45 minutes',
-      media: {
-        type: 'video' as const,
-        url: '/placeholder-video.mp4',
-        thumbnail: '/placeholder.svg'
-      },
-      likes: 8,
-      comments: 5,
-      isLiked: true
+      user: { name: 'Mike Chen', avatar: '👨‍💼', level: 22 },
+      content: 'New PR on bench press today! 225lbs x 5 reps. The grind never stops! 🔥',
+      timestamp: '4 hours ago',
+      likes: 31,
+      comments: 12
     },
     {
       id: 3,
-      user: 'Emma Wilson',
-      avatar: '👩‍🎓',
-      time: '1 day ago',
-      content: 'First time trying CrossFit and I\'m officially addicted! Special thanks to Alex for being an amazing workout partner 🙌',
-      workout: 'CrossFit - 60 minutes',
-      likes: 15,
-      comments: 7,
-      isLiked: false
+      user: { name: 'Jessica Williams', avatar: '👩‍🦱', level: 18 },
+      content: 'Morning yoga session complete! Starting the day with mindfulness and movement. 🧘‍♀️',
+      media: { type: 'video', url: '/placeholder.svg' },
+      timestamp: '6 hours ago',
+      likes: 19,
+      comments: 5
     }
-  ]);
+  ];
 
   const handleCreateSession = (sessionData: any) => {
     console.log('Creating session:', sessionData);
-    // Here you would typically send this to your backend
+    setShowSessionCreator(false);
+  };
+
+  const handleChatClick = (buddy: any) => {
+    setSelectedBuddy(buddy);
+    setShowChat(true);
+  };
+
+  const handleCloseChat = () => {
+    setShowChat(false);
+    setSelectedBuddy(null);
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation isLoggedIn={true} />
+    <div className="min-h-screen bg-background relative">
+      <Navigation isLoggedIn={true} onLogout={onLogout} />
       
+      {/* Session Creator Modal */}
+      {showSessionCreator && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
+                  Create Your Workout Session
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSessionCreator(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <SessionCreator onCreateSession={handleCreateSession} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Sidebar - User Stats */}
           <div className="lg:col-span-1">
             <UserStats />
           </div>
-          
-          {/* Main Content Area */}
-          <div className="lg:col-span-2">
-            <SessionCreator onCreateSession={handleCreateSession} />
-            
-            {/* Feed */}
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
-                Your Feed
-              </h2>
-              {posts.map((post) => (
+
+          {/* Center - Main Feed */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Create Session Button */}
+            <div className="text-center">
+              <Button 
+                onClick={() => setShowSessionCreator(true)}
+                size="lg"
+                className="gym-gradient text-white energy-glow hover:scale-105 transition-transform px-8 py-4 text-lg font-semibold rounded-full"
+              >
+                CREATE A SESSION
+              </Button>
+            </div>
+
+            {/* Feed Posts */}
+            <div className="space-y-6">
+              {feedPosts.map((post) => (
                 <FeedPost key={post.id} post={post} />
               ))}
             </div>
           </div>
-          
+
           {/* Right Sidebar - Gym Buddies */}
           <div className="lg:col-span-1">
-            <GymBuddiesList />
+            <GymBuddiesList onChatClick={handleChatClick} />
           </div>
         </div>
       </div>
+
+      {/* Chat Overlay */}
+      {showChat && selectedBuddy && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg w-full max-w-md h-[600px] flex flex-col">
+            <Chat buddy={selectedBuddy} onClose={handleCloseChat} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

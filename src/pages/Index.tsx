@@ -9,18 +9,21 @@ const Index = () => {
 
   const handleSignup = () => {
     console.log('Signup clicked');
-    // For demo purposes, let's simulate login
     setIsLoggedIn(true);
   };
 
   const handleLogin = () => {
     console.log('Login clicked');
-    // For demo purposes, let's simulate login
     setIsLoggedIn(true);
   };
 
+  const handleLogout = () => {
+    console.log('Logout clicked');
+    setIsLoggedIn(false);
+  };
+
   if (isLoggedIn) {
-    return <Dashboard />;
+    return <Dashboard onLogout={handleLogout} />;
   }
 
   return (

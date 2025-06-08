@@ -1,11 +1,12 @@
-
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, X, MessageSquare, MapPin, Clock, Dumbbell } from 'lucide-react';
 
 const Matches = () => {
+  const navigate = useNavigate();
   const [matches] = useState([
     {
       id: 1,
@@ -57,9 +58,13 @@ const Matches = () => {
     console.log('Start chat with:', matchId);
   };
 
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Navigation isLoggedIn={true} />
+      <Navigation isLoggedIn={true} onLogout={handleLogout} />
       
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">

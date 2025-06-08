@@ -2,15 +2,22 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Users, Menu, X } from 'lucide-react';
+import { Users, Menu, X, LogOut } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface NavigationProps {
   isLoggedIn?: boolean;
   onSignup?: () => void;
   onLogin?: () => void;
+  onLogout?: () => void;
 }
 
-const Navigation = ({ isLoggedIn = false, onSignup, onLogin }: NavigationProps) => {
+const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: NavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.pathname);
@@ -70,6 +77,12 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin }: NavigationProps) 
     }
   };
 
+  const handleLogoutClick = () => {
+    if (onLogout) {
+      onLogout();
+    }
+  };
+
   return (
     <nav className="bg-jet-black/95 backdrop-blur-sm border-b border-planet-purple/20 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -125,8 +138,20 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin }: NavigationProps) 
 
           {isLoggedIn && (
             <div className="hidden md:flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full"></div>
-              <span className="font-medium text-pure-white">John Doe</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center space-x-2 cursor-pointer">
+                    <div className="w-8 h-8 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full"></div>
+                    <span className="font-medium text-pure-white">John Doe</span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleLogoutClick}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
 
@@ -157,7 +182,7 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin }: NavigationProps) 
                 </button>
               ))}
               
-              {!isLoggedIn && (
+              {!isLoggedIn ? (
                 <div className="flex flex-col space-y-2 pt-4 border-t border-planet-purple/20">
                   <Button 
                     variant="outline" 
@@ -171,6 +196,17 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin }: NavigationProps) 
                     className="planet-gradient text-white"
                   >
                     Sign Up
+                  </Button>
+                </div>
+              ) : (
+                <div className="pt-4 border-t border-planet-purple/20">
+                  <Button 
+                    onClick={handleLogoutClick}
+                    variant="outline"
+                    className="w-full border-planet-purple text-planet-purple hover:bg-planet-purple hover:text-pure-white"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
                   </Button>
                 </div>
               )}

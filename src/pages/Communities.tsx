@@ -1,12 +1,13 @@
-
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Users, Plus, Crown, Calendar, MapPin, Search } from 'lucide-react';
 
 const Communities = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   
   const joinedCommunities = [
@@ -61,6 +62,10 @@ const Communities = () => {
     }
   ];
 
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   const filteredCommunities = availableCommunities.filter(community =>
     community.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     community.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -75,12 +80,12 @@ const Communities = () => {
   };
 
   const handleCommunityClick = (communityId: number) => {
-    console.log('Opening community:', communityId);
+    navigate(`/communities/${communityId}`);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation isLoggedIn={true} />
+      <Navigation isLoggedIn={true} onLogout={handleLogout} />
       
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -146,7 +151,11 @@ const Communities = () => {
             {/* Available Communities */}
             <div className="space-y-4">
               {filteredCommunities.map((community) => (
-                <Card key={community.id} className="p-6 hover:shadow-lg transition-all duration-300">
+                <Card 
+                  key={community.id} 
+                  className="p-6 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  onClick={() => handleCommunityClick(community.id)}
+                >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center text-2xl">
@@ -181,7 +190,10 @@ const Communities = () => {
 
                   <Button 
                     className="w-full planet-gradient text-white hover:scale-105 transition-transform"
-                    onClick={() => handleJoin(community.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleJoin(community.id);
+                    }}
                   >
                     Join Community
                   </Button>
