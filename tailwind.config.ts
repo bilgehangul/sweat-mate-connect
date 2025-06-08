@@ -53,10 +53,10 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				'energy-orange': 'hsl(var(--energy-orange))',
-				'electric-blue': 'hsl(var(--electric-blue))',
-				'neon-green': 'hsl(var(--neon-green))',
-				'dark-slate': 'hsl(var(--dark-slate))',
+				'planet-purple': 'hsl(var(--planet-purple))',
+				'energy-yellow': 'hsl(var(--energy-yellow))',
+				'jet-black': 'hsl(var(--jet-black))',
+				'pure-white': 'hsl(var(--pure-white))',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

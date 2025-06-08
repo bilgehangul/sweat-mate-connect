@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Users, Target, Shield, Calendar } from 'lucide-react';
@@ -12,11 +11,11 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
   return (
     <>
       {/* Hero Section */}
-      <section className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/10">
+      <section className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-jet-black via-planet-purple/20 to-jet-black">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto space-y-8 slide-up">
             {/* Main Headline */}
-            <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-energy-orange via-electric-blue to-neon-green bg-clip-text text-transparent leading-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-8xl font-black bg-gradient-to-r from-planet-purple via-energy-yellow to-planet-purple bg-clip-text text-transparent leading-tight">
               WORKOUT
               <br />
               WITH A
@@ -25,7 +24,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl lg:text-2xl text-pure-white/90 max-w-2xl mx-auto leading-relaxed">
               Find your perfect gym buddy, match workout schedules, and achieve your fitness goals together. 
               The future of fitness is social.
             </p>
@@ -35,7 +34,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
               <Button 
                 onClick={onSignup}
                 size="lg"
-                className="text-2xl px-12 py-6 gym-gradient text-white energy-glow hover:scale-110 transition-all duration-300 pulse-energy font-bold rounded-full"
+                className="text-xl md:text-2xl px-8 md:px-12 py-4 md:py-6 planet-gradient text-white energy-glow hover:scale-110 transition-all duration-300 pulse-energy font-bold rounded-full"
               >
                 START YOUR FITNESS JOURNEY
               </Button>
@@ -44,16 +43,16 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
             {/* Stats */}
             <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl font-bold text-energy-orange">10,000+</div>
-                <div className="text-muted-foreground">Active Users</div>
+                <div className="text-2xl md:text-3xl font-bold text-energy-yellow">10,000+</div>
+                <div className="text-pure-white/80">Active Users</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-electric-blue">50,000+</div>
-                <div className="text-muted-foreground">Workouts Completed</div>
+                <div className="text-2xl md:text-3xl font-bold text-energy-yellow">50,000+</div>
+                <div className="text-pure-white/80">Workouts Completed</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-neon-green">500+</div>
-                <div className="text-muted-foreground">Partner Gyms</div>
+                <div className="text-2xl md:text-3xl font-bold text-energy-yellow">500+</div>
+                <div className="text-pure-white/80">Partner Gyms</div>
               </div>
             </div>
           </div>
@@ -61,7 +60,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* How it Works Section */}
-      <section className="py-20 bg-accent/5">
+      <section id="how" className="py-16 md:py-20 bg-pure-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-4">
@@ -109,7 +108,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* Why Use It Section */}
-      <section className="py-20">
+      <section id="why" className="py-16 md:py-20 bg-planet-purple/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-neon-green bg-clip-text text-transparent mb-4">
@@ -156,7 +155,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* Supported Gyms Section */}
-      <section className="py-20 bg-accent/5">
+      <section id="gyms" className="py-16 md:py-20 bg-pure-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-neon-green to-energy-orange bg-clip-text text-transparent mb-4">
@@ -181,7 +180,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* Safety Section */}
-      <section className="py-20">
+      <section id="safety" className="py-16 md:py-20 bg-planet-purple/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-4">
@@ -232,18 +231,18 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-energy-orange to-electric-blue">
+      <section className="py-16 md:py-20 bg-gradient-to-r from-planet-purple to-energy-yellow">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Find Your Perfect Workout Partner?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join thousands of fitness enthusiasts who have transformed their workout experience
           </p>
           <Button 
             onClick={onSignup}
             size="lg"
-            className="text-xl px-10 py-4 bg-white text-primary hover:bg-gray-100 hover:scale-105 transition-all duration-300 font-bold rounded-full"
+            className="text-lg md:text-xl px-8 md:px-10 py-3 md:py-4 bg-white text-planet-purple hover:bg-gray-100 hover:scale-105 transition-all duration-300 font-bold rounded-full"
           >
             Get Started Today - It's Free!
           </Button>

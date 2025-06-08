@@ -74,7 +74,7 @@ const Dashboard = () => {
             
             {/* Feed */}
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
                 Your Feed
               </h2>
               {posts.map((post) => (
