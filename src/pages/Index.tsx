@@ -1,12 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import Navigation from '@/components/Navigation';
+import LandingHero from '@/components/LandingHero';
+import Dashboard from './Dashboard';
 
 const Index = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleSignup = () => {
+    console.log('Signup clicked');
+    // For demo purposes, let's simulate login
+    setIsLoggedIn(true);
+  };
+
+  const handleLogin = () => {
+    console.log('Login clicked');
+    // For demo purposes, let's simulate login
+    setIsLoggedIn(true);
+  };
+
+  if (isLoggedIn) {
+    return <Dashboard />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navigation 
+        isLoggedIn={false} 
+        onSignup={handleSignup} 
+        onLogin={handleLogin} 
+      />
+      <LandingHero onSignup={handleSignup} />
     </div>
   );
 };
