@@ -10,44 +10,14 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePosts } from '@/hooks/usePosts';
 
 const Dashboard = () => {
   const { signOut } = useAuth();
+  const { posts, loading: postsLoading } = usePosts();
   const [showSessionCreator, setShowSessionCreator] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [selectedBuddy, setSelectedBuddy] = useState<any>(null);
-
-  const feedPosts = [
-    {
-      id: 1,
-      user: 'Sarah Johnson',
-      avatar: '👩‍🦰',
-      time: '2 hours ago',
-      content: 'Just finished an amazing leg day! 💪 Who\'s ready to join me for some deadlifts tomorrow?',
-      media: { type: 'image' as const, url: '/placeholder.svg' },
-      likes: 24,
-      comments: 8
-    },
-    {
-      id: 2,
-      user: 'Mike Chen',
-      avatar: '👨‍💼',
-      time: '4 hours ago',
-      content: 'New PR on bench press today! 225lbs x 5 reps. The grind never stops! 🔥',
-      likes: 31,
-      comments: 12
-    },
-    {
-      id: 3,
-      user: 'Jessica Williams',
-      avatar: '👩‍🦱',
-      time: '6 hours ago',
-      content: 'Morning yoga session complete! Starting the day with mindfulness and movement. 🧘‍♀️',
-      media: { type: 'video' as const, url: '/placeholder.svg' },
-      likes: 19,
-      comments: 5
-    }
-  ];
 
   const handleCreateSession = (sessionData: any) => {
     console.log('Creating session:', sessionData);
@@ -118,9 +88,36 @@ const Dashboard = () => {
 
             {/* Feed Posts */}
             <div className="space-y-6">
-              {feedPosts.map((post) => (
-                <FeedPost key={post.id} post={post} />
-              ))}
+              {postsLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-energy-orange mx-auto"></div>
+                  <p className="text-muted-foreground mt-2">Loading posts...</p>
+                </div>
+              ) : posts.length > 0 ? (
+                posts.map((post) => (
+                  <FeedPost 
+                    key={post.id} 
+                    post={{
+                      id: parseInt(post.id),
+                      user: `${post.profiles.first_name || ''} ${post.profiles.last_name || ''}`.trim() || post.profiles.username || 'Unknown User',
+                      avatar: post.profiles.avatar_url || '👤',
+                      time: new Date(post.created_at).toLocaleDateString(),
+                      content: post.content,
+                      likes: post.post_likes.length,
+                      comments: post.post_comments.length,
+                      ...(post.media_url && { media: { type: post.media_type as 'image' | 'video', url: post.media_url } })
+                    }} 
+                  />
+                ))
+              ) : (
+                <Card className="p-6 text-center">
+                  <h3 className="text-lg font-bold mb-2">Welcome to GymBuddy!</h3>
+                  <p className="text-muted-foreground mb-4">No posts yet. Be the first to share your fitness journey!</p>
+                  <Button onClick={() => setShowSessionCreator(true)} className="gym-gradient text-white">
+                    Create Your First Session
+                  </Button>
+                </Card>
+              )}
             </div>
           </div>
 

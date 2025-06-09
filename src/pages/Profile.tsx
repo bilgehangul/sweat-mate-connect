@@ -10,69 +10,55 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, MapPin, Target, Trophy, Edit, Settings, Plus, X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
+import { usePosts } from '@/hooks/usePosts';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+  const { profile, loading: profileLoading, updateProfile } = useProfile();
+  const { posts, loading: postsLoading } = usePosts();
   const [showSessionCreator, setShowSessionCreator] = useState(false);
   
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
-
-  const [profile] = useState({
-    name: 'John Doe',
-    age: 29,
-    gender: 'Male',
-    avatar: '👨‍💼',
-    level: 23,
-    xp: 2340,
-    xpToNext: 2500,
-    joinDate: 'January 2024',
-    location: 'Los Angeles, CA',
-    favoriteGym: 'Gold\'s Gym Downtown',
-    workoutGoals: ['Build Muscle', 'Increase Strength', 'Improve Endurance'],
-    workoutPreferences: ['Strength Training', 'Cardio', 'HIIT'],
-    experienceLevel: 'Intermediate',
-    bio: 'Fitness enthusiast who loves pushing limits and helping others achieve their goals. Always looking for new challenges and workout partners!',
-    stats: {
-      workoutsCompleted: 127,
-      hoursExercised: '89h 32m',
-      favoriteBuddies: 12,
-      communitiesJoined: 3
-    },
-    recentWorkouts: [
-      { date: '2024-01-15', type: 'Chest & Triceps', duration: '75 min', gym: 'Gold\'s Gym' },
-      { date: '2024-01-13', type: 'Back & Biceps', duration: '80 min', gym: 'Gold\'s Gym' },
-      { date: '2024-01-11', type: 'Legs', duration: '90 min', gym: 'Gold\'s Gym' }
-    ]
-  });
-
-  const myFeedPosts = [
-    {
-      id: 1,
-      user: 'John Doe',
-      avatar: '👨‍💼',
-      time: '1 day ago',
-      content: 'Just hit a new PR on deadlifts! 405lbs for 3 reps. Feeling stronger every day 💪',
-      likes: 32,
-      comments: 8
-    },
-    {
-      id: 2,
-      user: 'John Doe',
-      avatar: '👨‍💼',
-      time: '3 days ago',
-      content: 'Morning cardio session complete! 5 miles in 35 minutes. Ready to tackle the day 🏃‍♂️',
-      media: { type: 'image' as const, url: '/placeholder.svg' },
-      likes: 24,
-      comments: 5
-    }
-  ];
 
   const handleCreateSession = (sessionData: any) => {
     console.log('Creating session:', sessionData);
     setShowSessionCreator(false);
   };
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-energy-orange"></div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation isLoggedIn={true} onLogout={handleLogout} />
+        <div className="container mx-auto px-4 py-8">
+          <Card className="p-6 text-center">
+            <h2 className="text-xl font-bold mb-4">Profile not found</h2>
+            <p className="text-muted-foreground">Unable to load your profile. Please try again.</p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const displayName = profile.first_name && profile.last_name 
+    ? `${profile.first_name} ${profile.last_name}` 
+    : profile.username || 'Unknown User';
+
+  // Filter posts by current user
+  const userPosts = posts.filter(post => post.author_id === profile.id);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -111,42 +97,48 @@ const Profile = () => {
             <Card className="p-6 text-center">
               <div className="relative">
                 <div className="w-24 h-24 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
-                  {profile.avatar}
+                  {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    '👤'
+                  )}
                 </div>
                 <Button size="sm" variant="outline" className="absolute top-0 right-0">
                   <Edit className="w-4 h-4" />
                 </Button>
               </div>
               
-              <h1 className="text-2xl font-bold mb-2">{profile.name}</h1>
+              <h1 className="text-2xl font-bold mb-2">{displayName}</h1>
               <p className="text-muted-foreground mb-4">
-                {profile.age} years old • {profile.gender}
+                {profile.age && `${profile.age} years old`} {profile.gender && `• ${profile.gender}`}
               </p>
               
-              {/* Level & XP */}
+              {/* Level & XP - Static for now */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-energy-yellow">Level {profile.level}</span>
-                  <span className="text-sm text-muted-foreground">{profile.xp}/{profile.xpToNext} XP</span>
+                  <span className="font-semibold text-energy-yellow">Level 1</span>
+                  <span className="text-sm text-muted-foreground">0/100 XP</span>
                 </div>
-                <Progress value={(profile.xp / profile.xpToNext) * 100} className="h-2" />
+                <Progress value={0} className="h-2" />
               </div>
 
-              <p className="text-sm text-foreground mb-4">{profile.bio}</p>
+              {profile.bio && <p className="text-sm text-foreground mb-4">{profile.bio}</p>}
               
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center justify-center">
                   <Calendar className="w-4 h-4 mr-2" />
-                  Joined {profile.joinDate}
+                  Joined {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
                 </div>
-                <div className="flex items-center justify-center">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  {profile.location}
-                </div>
+                {profile.location && (
+                  <div className="flex items-center justify-center">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    {profile.location}
+                  </div>
+                )}
               </div>
             </Card>
 
-            {/* Stats Card */}
+            {/* Stats Card - Static for now */}
             <Card className="p-6">
               <h3 className="text-lg font-bold mb-4 text-center bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
                 Fitness Stats
@@ -154,19 +146,19 @@ const Profile = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Workouts</span>
-                  <span className="font-bold text-planet-purple">{profile.stats.workoutsCompleted}</span>
+                  <span className="font-bold text-planet-purple">0</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Hours Exercised</span>
-                  <span className="font-bold text-planet-purple">{profile.stats.hoursExercised}</span>
+                  <span className="font-bold text-planet-purple">0h 0m</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Gym Buddies</span>
-                  <span className="font-bold text-planet-purple">{profile.stats.favoriteBuddies}</span>
+                  <span className="font-bold text-planet-purple">0</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Communities</span>
-                  <span className="font-bold text-planet-purple">{profile.stats.communitiesJoined}</span>
+                  <span className="font-bold text-planet-purple">0</span>
                 </div>
               </div>
             </Card>
@@ -199,11 +191,15 @@ const Profile = () => {
                       Workout Goals
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {profile.workoutGoals.map((goal, index) => (
-                        <Badge key={index} variant="secondary" className="bg-planet-purple/10 text-planet-purple">
-                          {goal}
-                        </Badge>
-                      ))}
+                      {profile.workout_goals && profile.workout_goals.length > 0 ? (
+                        profile.workout_goals.map((goal, index) => (
+                          <Badge key={index} variant="secondary" className="bg-planet-purple/10 text-planet-purple">
+                            {goal}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-sm">No workout goals set</p>
+                      )}
                     </div>
                   </Card>
 
@@ -213,14 +209,20 @@ const Profile = () => {
                       Preferences
                     </h3>
                     <div className="space-y-2">
-                      <p className="text-sm"><strong>Experience:</strong> {profile.experienceLevel}</p>
-                      <p className="text-sm"><strong>Favorite Gym:</strong> {profile.favoriteGym}</p>
+                      <p className="text-sm"><strong>Experience:</strong> {profile.experience_level || 'Not set'}</p>
+                      {profile.favorite_gym && (
+                        <p className="text-sm"><strong>Favorite Gym:</strong> {profile.favorite_gym}</p>
+                      )}
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {profile.workoutPreferences.map((pref, index) => (
-                          <Badge key={index} variant="outline" className="border-energy-yellow text-energy-yellow">
-                            {pref}
-                          </Badge>
-                        ))}
+                        {profile.workout_preferences && profile.workout_preferences.length > 0 ? (
+                          profile.workout_preferences.map((pref, index) => (
+                            <Badge key={index} variant="outline" className="border-energy-yellow text-energy-yellow">
+                              {pref}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-muted-foreground text-sm">No preferences set</p>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -240,24 +242,38 @@ const Profile = () => {
               </TabsContent>
 
               <TabsContent value="feed" className="space-y-6">
-                {myFeedPosts.map((post) => (
-                  <FeedPost key={post.id} post={post} />
-                ))}
+                {postsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-energy-orange mx-auto"></div>
+                  </div>
+                ) : userPosts.length > 0 ? (
+                  userPosts.map((post) => (
+                    <FeedPost 
+                      key={post.id} 
+                      post={{
+                        id: parseInt(post.id),
+                        user: `${post.profiles.first_name || ''} ${post.profiles.last_name || ''}`.trim() || post.profiles.username || 'Unknown User',
+                        avatar: post.profiles.avatar_url || '👤',
+                        time: new Date(post.created_at).toLocaleDateString(),
+                        content: post.content,
+                        likes: post.post_likes.length,
+                        comments: post.post_comments.length,
+                        ...(post.media_url && { media: { type: post.media_type as 'image' | 'video', url: post.media_url } })
+                      }} 
+                    />
+                  ))
+                ) : (
+                  <Card className="p-6 text-center">
+                    <p className="text-muted-foreground">No posts yet. Share your fitness journey!</p>
+                  </Card>
+                )}
               </TabsContent>
 
               <TabsContent value="workouts" className="space-y-6">
                 <Card className="p-6">
                   <h3 className="text-lg font-bold mb-4">Recent Workouts</h3>
-                  <div className="space-y-3">
-                    {profile.recentWorkouts.map((workout, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{workout.type}</p>
-                          <p className="text-sm text-muted-foreground">{workout.date} • {workout.gym}</p>
-                        </div>
-                        <Badge variant="outline">{workout.duration}</Badge>
-                      </div>
-                    ))}
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No workout sessions yet. Create your first session!</p>
                   </div>
                 </Card>
               </TabsContent>
