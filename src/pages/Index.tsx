@@ -1,29 +1,34 @@
 
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import LandingHero from '@/components/LandingHero';
-import Dashboard from './Dashboard';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && !loading) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
 
   const handleSignup = () => {
-    console.log('Signup clicked');
-    setIsLoggedIn(true);
+    navigate('/signup');
   };
 
   const handleLogin = () => {
-    console.log('Login clicked');
-    setIsLoggedIn(true);
+    navigate('/login');
   };
 
-  const handleLogout = () => {
-    console.log('Logout clicked');
-    setIsLoggedIn(false);
-  };
-
-  if (isLoggedIn) {
-    return <Dashboard onLogout={handleLogout} />;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-energy-orange"></div>
+      </div>
+    );
   }
 
   return (

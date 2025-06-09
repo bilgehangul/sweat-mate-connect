@@ -9,7 +9,378 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      gym_buddies: {
+        Row: {
+          created_at: string | null
+          id: string
+          recipient_id: string
+          requester_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          recipient_id: string
+          requester_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          recipient_id?: string
+          requester_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_buddies_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_buddies_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          media_type: string | null
+          media_url: string | null
+          updated_at: string | null
+          workout_session_id: string | null
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          updated_at?: string | null
+          workout_session_id?: string | null
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          media_type?: string | null
+          media_url?: string | null
+          updated_at?: string | null
+          workout_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_workout_session_id_fkey"
+            columns: ["workout_session_id"]
+            isOneToOne: false
+            referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          experience_level: string | null
+          favorite_gym: string | null
+          first_name: string | null
+          gender: string | null
+          id: string
+          last_name: string | null
+          location: string | null
+          updated_at: string | null
+          username: string | null
+          workout_goals: string[] | null
+          workout_preferences: string[] | null
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          experience_level?: string | null
+          favorite_gym?: string | null
+          first_name?: string | null
+          gender?: string | null
+          id: string
+          last_name?: string | null
+          location?: string | null
+          updated_at?: string | null
+          username?: string | null
+          workout_goals?: string[] | null
+          workout_preferences?: string[] | null
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          experience_level?: string | null
+          favorite_gym?: string | null
+          first_name?: string | null
+          gender?: string | null
+          id?: string
+          last_name?: string | null
+          location?: string | null
+          updated_at?: string | null
+          username?: string | null
+          workout_goals?: string[] | null
+          workout_preferences?: string[] | null
+        }
+        Relationships: []
+      }
+      session_participants: {
+        Row: {
+          id: string
+          joined_at: string | null
+          session_id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string | null
+          session_id: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string | null
+          session_id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workout_requests: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string | null
+          recipient_id: string
+          requester_id: string
+          session_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          recipient_id: string
+          requester_id: string
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          recipient_id?: string
+          requester_id?: string
+          session_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_requests_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workout_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workout_requests_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workout_sessions: {
+        Row: {
+          created_at: string | null
+          creator_id: string
+          current_participants: number | null
+          description: string | null
+          end_time: string
+          gym_location: string
+          id: string
+          max_participants: number | null
+          scheduled_date: string
+          start_time: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          workout_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          creator_id: string
+          current_participants?: number | null
+          description?: string | null
+          end_time: string
+          gym_location: string
+          id?: string
+          max_participants?: number | null
+          scheduled_date: string
+          start_time: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          workout_type: string
+        }
+        Update: {
+          created_at?: string | null
+          creator_id?: string
+          current_participants?: number | null
+          description?: string | null
+          end_time?: string
+          gym_location?: string
+          id?: string
+          max_participants?: number | null
+          scheduled_date?: string
+          start_time?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          workout_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_sessions_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

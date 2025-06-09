@@ -9,12 +9,10 @@ import Chat from '@/components/Chat';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface DashboardProps {
-  onLogout?: () => void;
-}
-
-const Dashboard = ({ onLogout }: DashboardProps) => {
+const Dashboard = () => {
+  const { signOut } = useAuth();
   const [showSessionCreator, setShowSessionCreator] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [selectedBuddy, setSelectedBuddy] = useState<any>(null);
@@ -66,9 +64,13 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     setSelectedBuddy(null);
   };
 
+  const handleLogout = async () => {
+    await signOut();
+  };
+
   return (
     <div className="min-h-screen bg-background relative">
-      <Navigation isLoggedIn={true} onLogout={onLogout} />
+      <Navigation isLoggedIn={true} onLogout={handleLogout} />
       
       {/* Session Creator Modal */}
       {showSessionCreator && (
