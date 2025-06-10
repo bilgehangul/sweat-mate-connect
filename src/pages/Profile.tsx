@@ -1,9 +1,10 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import SessionCreator from '@/components/SessionCreator';
 import FeedPost from '@/components/FeedPost';
+import ProfileEditForm from '@/components/ProfileEditForm';
+import CreatePostForm from '@/components/CreatePostForm';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +21,8 @@ const Profile = () => {
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const { posts, loading: postsLoading } = usePosts();
   const [showSessionCreator, setShowSessionCreator] = useState(false);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [showCreatePost, setShowCreatePost] = useState(false);
   
   const handleLogout = async () => {
     await signOut();
@@ -86,6 +89,20 @@ const Profile = () => {
           </div>
         </div>
       )}
+
+      {/* Profile Edit Modal */}
+      {showProfileEdit && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <ProfileEditForm onClose={() => setShowProfileEdit(false)} />
+        </div>
+      )}
+
+      {/* Create Post Modal */}
+      {showCreatePost && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <CreatePostForm onClose={() => setShowCreatePost(false)} />
+        </div>
+      )}
       
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -103,7 +120,7 @@ const Profile = () => {
                     '👤'
                   )}
                 </div>
-                <Button size="sm" variant="outline" className="absolute top-0 right-0">
+                <Button size="sm" variant="outline" className="absolute top-0 right-0" onClick={() => setShowProfileEdit(true)}>
                   <Edit className="w-4 h-4" />
                 </Button>
               </div>
@@ -230,7 +247,7 @@ const Profile = () => {
 
                 {/* Action Buttons */}
                 <div className="flex space-x-4">
-                  <Button className="flex-1 planet-gradient text-white hover:scale-105 transition-transform">
+                  <Button className="flex-1 planet-gradient text-white hover:scale-105 transition-transform" onClick={() => setShowProfileEdit(true)}>
                     <Edit className="w-4 h-4 mr-2" />
                     Edit Profile
                   </Button>
@@ -242,6 +259,14 @@ const Profile = () => {
               </TabsContent>
 
               <TabsContent value="feed" className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-bold">My Posts</h3>
+                  <Button onClick={() => setShowCreatePost(true)} size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Post
+                  </Button>
+                </div>
+                
                 {postsLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-energy-orange mx-auto"></div>
@@ -264,7 +289,8 @@ const Profile = () => {
                   ))
                 ) : (
                   <Card className="p-6 text-center">
-                    <p className="text-muted-foreground">No posts yet. Share your fitness journey!</p>
+                    <p className="text-muted-foreground mb-4">No posts yet. Share your fitness journey!</p>
+                    <Button onClick={() => setShowCreatePost(true)}>Create Your First Post</Button>
                   </Card>
                 )}
               </TabsContent>

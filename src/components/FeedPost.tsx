@@ -2,6 +2,8 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageSquare, Share, Play } from 'lucide-react';
+import { usePosts } from '@/hooks/usePosts';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface FeedPostProps {
   post: {
@@ -12,19 +14,30 @@ interface FeedPostProps {
     content: string;
     workout?: string;
     media?: {
-      type: string; // Changed from 'image' | 'video' to string to be more flexible
+      type: string;
       url: string;
       thumbnail?: string;
     };
     likes: number;
     comments: number;
     isLiked?: boolean;
+    postLikes?: { id: string; user_id: string }[];
   };
 }
 
 const FeedPost = ({ post }: FeedPostProps) => {
-  const handleLike = () => {
-    console.log('Liked post:', post.id);
+  const { likePost } = usePosts();
+  const { user } = useAuth();
+
+  // Check if current user has liked this post
+  const isLiked = post.postLikes?.some(like => like.user_id === user?.id) || false;
+
+  const handleLike = async () => {
+    try {
+      await likePost(post.id.toString());
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
   };
 
   const handleComment = () => {
@@ -92,12 +105,12 @@ const FeedPost = ({ post }: FeedPostProps) => {
               size="sm" 
               onClick={handleLike}
               className={`transition-colors ${
-                post.isLiked 
+                isLiked 
                   ? 'text-red-500 hover:text-red-600' 
                   : 'text-muted-foreground hover:text-red-500'
               }`}
             >
-              <Heart className={`w-4 h-4 mr-1 ${post.isLiked ? 'fill-current' : ''}`} />
+              <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
               {post.likes}
             </Button>
             <Button 

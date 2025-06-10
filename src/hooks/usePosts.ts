@@ -8,7 +8,7 @@ interface Post {
   author_id: string;
   content: string;
   media_url: string | null;
-  media_type: string | null; // Changed from 'image' | 'video' | null to string | null
+  media_type: string | null;
   workout_session_id: string | null;
   created_at: string;
   updated_at: string;
@@ -87,21 +87,41 @@ export const usePosts = () => {
 
   const likePost = async (postId: string) => {
     try {
-      const { error } = await supabase
-        .from('post_likes')
-        .insert({
-          post_id: postId,
-          user_id: user?.id
-        });
+      // Check if user already liked this post
+      const existingLike = posts
+        .find(post => post.id === postId)
+        ?.post_likes.find(like => like.user_id === user?.id);
 
-      if (error) {
-        console.error('Error liking post:', error);
-        throw error;
+      if (existingLike) {
+        // Unlike the post
+        const { error } = await supabase
+          .from('post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user?.id);
+
+        if (error) {
+          console.error('Error unliking post:', error);
+          throw error;
+        }
+      } else {
+        // Like the post
+        const { error } = await supabase
+          .from('post_likes')
+          .insert({
+            post_id: postId,
+            user_id: user?.id
+          });
+
+        if (error) {
+          console.error('Error liking post:', error);
+          throw error;
+        }
       }
 
       await fetchPosts();
     } catch (err) {
-      console.error('Error liking post:', err);
+      console.error('Error toggling like:', err);
       throw err;
     }
   };
