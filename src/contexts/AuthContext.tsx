@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -38,13 +37,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Redirect to profile page after successful authentication
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Use setTimeout to avoid conflicts with React navigation
-          setTimeout(() => {
-            window.location.href = '/profile';
-          }, 100);
-        }
+        // Remove the automatic redirect - let the components handle routing
+        // The ProtectedRoute and individual pages will handle navigation
       }
     );
 
