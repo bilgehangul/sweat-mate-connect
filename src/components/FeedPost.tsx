@@ -12,7 +12,7 @@ interface FeedPostProps {
     content: string;
     workout?: string;
     media?: {
-      type: 'image' | 'video';
+      type: string; // Changed from 'image' | 'video' to string to be more flexible
       url: string;
       thumbnail?: string;
     };
@@ -60,7 +60,7 @@ const FeedPost = ({ post }: FeedPostProps) => {
                   alt="Post media"
                   className="w-full max-h-96 object-cover hover:scale-105 transition-transform cursor-pointer"
                 />
-              ) : (
+              ) : post.media.type === 'video' ? (
                 <div className="relative">
                   <img 
                     src={post.media.thumbnail || '/placeholder.svg'} 
@@ -76,7 +76,7 @@ const FeedPost = ({ post }: FeedPostProps) => {
                     </Button>
                   </div>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
           

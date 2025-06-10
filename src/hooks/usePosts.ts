@@ -8,7 +8,7 @@ interface Post {
   author_id: string;
   content: string;
   media_url: string | null;
-  media_type: 'image' | 'video' | null;
+  media_type: string | null; // Changed from 'image' | 'video' | null to string | null
   workout_session_id: string | null;
   created_at: string;
   updated_at: string;
