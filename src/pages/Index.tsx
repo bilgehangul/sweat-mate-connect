@@ -1,4 +1,5 @@
 
+import Navigation from "@/components/Navigation";
 import LandingHero from "@/components/LandingHero";
 import Footer from "@/components/Footer";
 import SupportedGyms from "@/components/SupportedGyms";
@@ -13,12 +14,22 @@ const Index = () => {
     navigate('/signup');
   };
 
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen">
+      <Navigation 
+        isLoggedIn={false} 
+        onSignup={handleSignup} 
+        onLogin={handleLogin} 
+      />
+      
       <LandingHero onSignup={handleSignup} />
       
       {/* How It Works Section */}
-      <section className="py-16 bg-muted/30">
+      <section id="how" className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
@@ -65,7 +76,10 @@ const Index = () => {
         </div>
       </section>
 
-      <SupportedGyms />
+      <div id="gyms">
+        <SupportedGyms />
+      </div>
+      
       <Footer />
     </div>
   );
