@@ -23,7 +23,7 @@ const ProfileEditForm = ({ onClose }: ProfileEditFormProps) => {
     last_name: profile?.last_name || '',
     username: profile?.username || '',
     bio: profile?.bio || '',
-    age: profile?.age || '',
+    age: profile?.age?.toString() || '',
     gender: profile?.gender || '',
     location: profile?.location || '',
     favorite_gym: profile?.favorite_gym || '',
