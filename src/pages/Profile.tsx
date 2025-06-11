@@ -1,325 +1,178 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
-import SessionCreator from '@/components/SessionCreator';
-import FeedPost from '@/components/FeedPost';
 import ProfileEditForm from '@/components/ProfileEditForm';
-import CreatePostForm from '@/components/CreatePostForm';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, MapPin, Target, Trophy, Edit, Settings, Plus, X } from 'lucide-react';
+import { Edit, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
-import { usePosts } from '@/hooks/usePosts';
 import { useUserStats } from '@/hooks/useUserStats';
-import { useGymBuddies } from '@/hooks/useGymBuddies';
-import { useCommunities } from '@/hooks/useCommunities';
 
 const Profile = () => {
-  const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
-  const { posts, loading: postsLoading } = usePosts();
   const { stats, loading: statsLoading } = useUserStats();
-  const { buddies } = useGymBuddies();
-  const { communities } = useCommunities();
-  const [showSessionCreator, setShowSessionCreator] = useState(false);
-  const [showProfileEdit, setShowProfileEdit] = useState(false);
-  const [showCreatePost, setShowCreatePost] = useState(false);
-  
+  const [isEditing, setIsEditing] = useState(false);
+
   const handleLogout = async () => {
     await signOut();
-    navigate('/');
-  };
-
-  const handleCreateSession = (sessionData: any) => {
-    console.log('Creating session:', sessionData);
-    setShowSessionCreator(false);
   };
 
   if (profileLoading || statsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-energy-orange"></div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
       <div className="min-h-screen bg-background">
         <Navigation isLoggedIn={true} onLogout={handleLogout} />
         <div className="container mx-auto px-4 py-8">
-          <Card className="p-6 text-center">
-            <h2 className="text-xl font-bold mb-4">Profile not found</h2>
-            <p className="text-muted-foreground">Unable to load your profile. Please try again.</p>
-          </Card>
+          <div className="animate-pulse space-y-6">
+            <div className="h-32 bg-gray-200 rounded-lg"></div>
+            <div className="h-64 bg-gray-200 rounded-lg"></div>
+          </div>
         </div>
       </div>
     );
   }
 
-  const displayName = profile.first_name && profile.last_name 
-    ? `${profile.first_name} ${profile.last_name}` 
-    : profile.username || 'Unknown User';
-
-  // Filter posts by current user
-  const userPosts = posts.filter(post => post.author_id === profile.id);
-
-  // Calculate level and XP from stats
-  const level = stats?.level || 1;
-  const currentXP = stats?.xp || 0;
-  const nextLevelXP = level * 100;
-  const xpProgress = Math.min((currentXP / nextLevelXP) * 100, 100);
+  const displayName = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}`
+    : profile?.username || 'User';
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background">
       <Navigation isLoggedIn={true} onLogout={handleLogout} />
       
-      {/* Session Creator Modal */}
-      {showSessionCreator && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
-                  Create Your Workout Session
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSessionCreator(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <SessionCreator onCreateSession={handleCreateSession} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Profile Edit Modal */}
-      {showProfileEdit && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <ProfileEditForm onClose={() => setShowProfileEdit(false)} />
-        </div>
-      )}
-
-      {/* Create Post Modal */}
-      {showCreatePost && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <CreatePostForm onClose={() => setShowCreatePost(false)} />
-        </div>
-      )}
-      
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Left Column - Profile Info */}
-          <div className="lg:col-span-1 space-y-6">
-            
-            {/* Profile Card */}
-            <Card className="p-6 text-center">
-              <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
-                  {profile.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Profile Header */}
+          <Card className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-r from-energy-orange to-electric-blue flex items-center justify-center text-white text-2xl font-bold">
+                  {profile?.avatar_url ? (
+                    <img 
+                      src={profile.avatar_url} 
+                      alt="Profile" 
+                      className="w-full h-full rounded-full object-cover"
+                    />
                   ) : (
-                    '👤'
+                    displayName.charAt(0).toUpperCase()
                   )}
                 </div>
-                <Button size="sm" variant="outline" className="absolute top-0 right-0" onClick={() => setShowProfileEdit(true)}>
-                  <Edit className="w-4 h-4" />
-                </Button>
-              </div>
-              
-              <h1 className="text-2xl font-bold mb-2">{displayName}</h1>
-              <p className="text-muted-foreground mb-4">
-                {profile.age && `${profile.age} years old`} {profile.gender && `• ${profile.gender}`}
-              </p>
-              
-              {/* Level & XP */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-energy-yellow">Level {level}</span>
-                  <span className="text-sm text-muted-foreground">{currentXP}/{nextLevelXP} XP</span>
-                </div>
-                <Progress value={xpProgress} className="h-2" />
-              </div>
-
-              {profile.bio && <p className="text-sm text-foreground mb-4">{profile.bio}</p>}
-              
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center justify-center">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Joined {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-                </div>
-                {profile.location && (
-                  <div className="flex items-center justify-center">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    {profile.location}
+                <div>
+                  <h1 className="text-3xl font-bold">{displayName}</h1>
+                  <p className="text-muted-foreground">@{profile?.username || 'username'}</p>
+                  <div className="flex items-center space-x-4 mt-2">
+                    <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded">
+                      Level {stats?.level || 1}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {stats?.xp || 0} XP
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
-            </Card>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditing(!isEditing)}
+                className="flex items-center space-x-2"
+              >
+                <Edit className="w-4 h-4" />
+                <span>{isEditing ? 'Cancel' : 'Edit Profile'}</span>
+              </Button>
+            </div>
 
-            {/* Stats Card */}
+            {profile?.bio && (
+              <div className="mt-4">
+                <p className="text-muted-foreground">{profile.bio}</p>
+              </div>
+            )}
+          </Card>
+
+          {/* Edit Form */}
+          {isEditing && (
             <Card className="p-6">
-              <h3 className="text-lg font-bold mb-4 text-center bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
-                Fitness Stats
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Workouts</span>
-                  <span className="font-bold text-planet-purple">{stats?.workouts_completed || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Hours Exercised</span>
-                  <span className="font-bold text-planet-purple">
-                    {Math.floor((stats?.total_exercise_hours || 0) / 60)}h {(stats?.total_exercise_hours || 0) % 60}m
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Gym Buddies</span>
-                  <span className="font-bold text-planet-purple">{buddies?.length || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Communities</span>
-                  <span className="font-bold text-planet-purple">{communities?.length || 0}</span>
-                </div>
-              </div>
+              <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
+              <ProfileEditForm onComplete={() => setIsEditing(false)} />
             </Card>
+          )}
 
-            {/* Create Session Button */}
-            <Button 
-              onClick={() => setShowSessionCreator(true)}
-              className="w-full planet-gradient text-white hover:scale-105 transition-transform"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Session
-            </Button>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="p-6 text-center">
+              <div className="text-3xl font-bold text-energy-orange">
+                {stats?.workouts_completed || 0}
+              </div>
+              <div className="text-muted-foreground">Workouts Completed</div>
+            </Card>
+            
+            <Card className="p-6 text-center">
+              <div className="text-3xl font-bold text-electric-blue">
+                {Math.floor((stats?.total_exercise_hours || 0) / 60)}h {(stats?.total_exercise_hours || 0) % 60}m
+              </div>
+              <div className="text-muted-foreground">Total Exercise Time</div>
+            </Card>
+            
+            <Card className="p-6 text-center">
+              <div className="text-3xl font-bold text-neon-green">
+                {stats?.ranking || 0}/5
+              </div>
+              <div className="text-muted-foreground">Fitness Ranking</div>
+            </Card>
           </div>
 
-          {/* Right Column - Tabs */}
-          <div className="lg:col-span-2">
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="feed">My Feed</TabsTrigger>
-                <TabsTrigger value="workouts">Workouts</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-6">
-                {/* Preferences & Goals */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-4 flex items-center">
-                      <Target className="w-5 h-5 mr-2 text-planet-purple" />
-                      Workout Goals
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {profile.workout_goals && profile.workout_goals.length > 0 ? (
-                        profile.workout_goals.map((goal, index) => (
-                          <Badge key={index} variant="secondary" className="bg-planet-purple/10 text-planet-purple">
-                            {goal}
-                          </Badge>
-                        ))
-                      ) : (
-                        <p className="text-muted-foreground text-sm">No workout goals set</p>
-                      )}
+          {/* Profile Details */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Profile Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-semibold mb-2">Personal Info</h3>
+                <div className="space-y-2 text-sm">
+                  <div><span className="text-muted-foreground">Age:</span> {profile?.age || 'Not specified'}</div>
+                  <div><span className="text-muted-foreground">Gender:</span> {profile?.gender || 'Not specified'}</div>
+                  <div><span className="text-muted-foreground">Location:</span> {profile?.location || 'Not specified'}</div>
+                  <div><span className="text-muted-foreground">Experience:</span> {profile?.experience_level || 'Beginner'}</div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Fitness Info</h3>
+                <div className="space-y-2 text-sm">
+                  <div><span className="text-muted-foreground">Favorite Gym:</span> {profile?.favorite_gym || 'Not specified'}</div>
+                  <div>
+                    <span className="text-muted-foreground">Workout Goals:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {profile?.workout_goals?.map((goal, index) => (
+                        <span key={index} className="bg-primary/10 text-primary px-2 py-1 rounded text-xs">
+                          {goal}
+                        </span>
+                      )) || 'Not specified'}
                     </div>
-                  </Card>
-
-                  <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-4 flex items-center">
-                      <Trophy className="w-5 h-5 mr-2 text-energy-yellow" />
-                      Preferences
-                    </h3>
-                    <div className="space-y-2">
-                      <p className="text-sm"><strong>Experience:</strong> {profile.experience_level || 'Not set'}</p>
-                      {profile.favorite_gym && (
-                        <p className="text-sm"><strong>Favorite Gym:</strong> {profile.favorite_gym}</p>
-                      )}
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {profile.workout_preferences && profile.workout_preferences.length > 0 ? (
-                          profile.workout_preferences.map((pref, index) => (
-                            <Badge key={index} variant="outline" className="border-energy-yellow text-energy-yellow">
-                              {pref}
-                            </Badge>
-                          ))
-                        ) : (
-                          <p className="text-muted-foreground text-sm">No preferences set</p>
-                        )}
-                      </div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Workout Preferences:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {profile?.workout_preferences?.map((pref, index) => (
+                        <span key={index} className="bg-secondary/50 text-secondary-foreground px-2 py-1 rounded text-xs">
+                          {pref}
+                        </span>
+                      )) || 'Not specified'}
                     </div>
-                  </Card>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex space-x-4">
-                  <Button className="flex-1 planet-gradient text-white hover:scale-105 transition-transform" onClick={() => setShowProfileEdit(true)}>
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </Button>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="feed" className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-bold">My Posts</h3>
-                  <Button onClick={() => setShowCreatePost(true)} size="sm">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Post
-                  </Button>
-                </div>
-                
-                {postsLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-energy-orange mx-auto"></div>
                   </div>
-                ) : userPosts.length > 0 ? (
-                  userPosts.map((post) => (
-                    <FeedPost 
-                      key={post.id} 
-                      post={{
-                        id: parseInt(post.id),
-                        user: `${post.profiles.first_name || ''} ${post.profiles.last_name || ''}`.trim() || post.profiles.username || 'Unknown User',
-                        avatar: post.profiles.avatar_url || '👤',
-                        time: new Date(post.created_at).toLocaleDateString(),
-                        content: post.content,
-                        likes: post.post_likes.length,
-                        comments: post.post_comments.length,
-                        postLikes: post.post_likes,
-                        ...(post.media_url && { media: { type: post.media_type as 'image' | 'video', url: post.media_url } })
-                      }} 
-                    />
-                  ))
-                ) : (
-                  <Card className="p-6 text-center">
-                    <p className="text-muted-foreground mb-4">No posts yet. Share your fitness journey!</p>
-                    <Button onClick={() => setShowCreatePost(true)}>Create Your First Post</Button>
-                  </Card>
-                )}
-              </TabsContent>
+                </div>
+              </div>
+            </div>
+          </Card>
 
-              <TabsContent value="workouts" className="space-y-6">
-                <Card className="p-6">
-                  <h3 className="text-lg font-bold mb-4">Recent Workouts</h3>
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No workout sessions yet. Create your first session!</p>
-                  </div>
-                </Card>
-              </TabsContent>
-            </Tabs>
+          {/* Logout Button */}
+          <div className="text-center">
+            <Button 
+              variant="destructive" 
+              onClick={handleLogout}
+              className="flex items-center space-x-2 mx-auto"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </Button>
           </div>
         </div>
       </div>

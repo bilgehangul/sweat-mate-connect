@@ -4,14 +4,12 @@ import { Progress } from '@/components/ui/progress';
 import { Heart } from 'lucide-react';
 import { useUserStats } from '@/hooks/useUserStats';
 import { useGymBuddies } from '@/hooks/useGymBuddies';
-import { useCommunities } from '@/hooks/useCommunities';
 
 const UserStats = () => {
   const { stats, loading: statsLoading } = useUserStats();
   const { buddies, loading: buddiesLoading } = useGymBuddies();
-  const { communities, loading: communitiesLoading } = useCommunities();
 
-  if (statsLoading || buddiesLoading || communitiesLoading) {
+  if (statsLoading || buddiesLoading) {
     return (
       <div className="space-y-4">
         <div className="animate-pulse">

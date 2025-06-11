@@ -4,15 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UserStats {
-  id: string;
-  user_id: string;
   workouts_completed: number;
   total_exercise_hours: number;
   ranking: number;
   level: number;
   xp: number;
-  created_at: string;
-  updated_at: string;
 }
 
 export const useUserStats = () => {
@@ -34,30 +30,36 @@ export const useUserStats = () => {
     try {
       setLoading(true);
       
-      // First try to get existing stats
-      let { data: existingStats, error: fetchError } = await supabase
-        .from('user_stats')
+      // Get workout sessions created by user
+      const { data: sessions, error: sessionsError } = await supabase
+        .from('workout_sessions')
         .select('*')
-        .eq('user_id', user?.id)
-        .single();
+        .eq('creator_id', user?.id);
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
-      }
+      if (sessionsError) throw sessionsError;
 
-      // If no stats exist, create them
-      if (!existingStats) {
-        const { data: newStats, error: createError } = await supabase
-          .from('user_stats')
-          .insert({ user_id: user?.id })
-          .select()
-          .single();
+      // Get matches for the user
+      const { data: matches, error: matchesError } = await supabase
+        .from('matches')
+        .select('*')
+        .or(`user1_id.eq.${user?.id},user2_id.eq.${user?.id}`);
 
-        if (createError) throw createError;
-        existingStats = newStats;
-      }
+      if (matchesError) throw matchesError;
 
-      setStats(existingStats);
+      // Calculate stats
+      const workouts_completed = sessions?.length || 0;
+      const total_exercise_hours = workouts_completed * 60; // Assume 1 hour per session
+      const xp = workouts_completed * 50 + (matches?.length || 0) * 25;
+      const level = Math.floor(xp / 100) + 1;
+      const ranking = Math.min(5, Math.floor(workouts_completed / 2) + 1);
+
+      setStats({
+        workouts_completed,
+        total_exercise_hours,
+        ranking,
+        level,
+        xp
+      });
     } catch (err: any) {
       console.error('Error fetching user stats:', err);
       setError(err.message);
@@ -66,20 +68,9 @@ export const useUserStats = () => {
     }
   };
 
-  const updateStats = async (updates: Partial<UserStats>) => {
-    try {
-      const { error } = await supabase
-        .from('user_stats')
-        .update(updates)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      await fetchUserStats();
-    } catch (err: any) {
-      console.error('Error updating stats:', err);
-      throw err;
-    }
+  const updateStats = async () => {
+    // Since we're calculating from existing data, just refetch
+    await fetchUserStats();
   };
 
   return {
