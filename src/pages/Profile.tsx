@@ -92,7 +92,7 @@ const Profile = () => {
           {isEditing && (
             <Card className="p-6">
               <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
-              <ProfileEditForm onComplete={() => setIsEditing(false)} />
+              <ProfileEditForm onClose={() => setIsEditing(false)} />
             </Card>
           )}
 
