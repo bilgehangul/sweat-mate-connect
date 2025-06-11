@@ -2,40 +2,59 @@
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Heart } from 'lucide-react';
+import { useUserStats } from '@/hooks/useUserStats';
+import { useGymBuddies } from '@/hooks/useGymBuddies';
+import { useCommunities } from '@/hooks/useCommunities';
 
 const UserStats = () => {
-  const stats = [
+  const { stats, loading: statsLoading } = useUserStats();
+  const { buddies, loading: buddiesLoading } = useGymBuddies();
+  const { communities, loading: communitiesLoading } = useCommunities();
+
+  if (statsLoading || buddiesLoading || communitiesLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded mb-4"></div>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-20 bg-gray-200 rounded mb-4"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const level = stats?.level || 1;
+  const currentXP = stats?.xp || 0;
+  const nextLevelXP = level * 100; // Simple progression
+  const xpProgress = Math.min((currentXP / nextLevelXP) * 100, 100);
+
+  const statsData = [
     {
       label: 'Workouts Completed',
-      value: '127',
+      value: stats?.workouts_completed || 0,
       icon: '💪',
       color: 'text-energy-orange'
     },
     {
       label: 'Ranking',
-      value: '4/5',
+      value: `${stats?.ranking || 0}/5`,
       icon: '⭐',
       color: 'text-yellow-500'
     },
     {
       label: 'Hours Exercised',
-      value: '89h 32m',
+      value: `${Math.floor((stats?.total_exercise_hours || 0) / 60)}h ${(stats?.total_exercise_hours || 0) % 60}m`,
       icon: '⏱️',
       color: 'text-electric-blue'
     },
     {
-      label: 'Favorite Buddies',
-      value: '12',
+      label: 'Gym Buddies',
+      value: buddies?.length || 0,
       icon: <Heart className="w-4 h-4 fill-current" />,
       color: 'text-red-500'
     }
   ];
-
-  // XP data for level progression
-  const level = 23;
-  const currentXP = 2340;
-  const nextLevelXP = 2500;
-  const xpProgress = (currentXP / nextLevelXP) * 100;
 
   return (
     <div className="space-y-4">
@@ -61,13 +80,13 @@ const UserStats = () => {
             </div>
             <Progress value={xpProgress} className="h-2" />
             <p className="text-xs text-center text-muted-foreground">
-              {nextLevelXP - currentXP} XP to level {level + 1}
+              {Math.max(0, nextLevelXP - currentXP)} XP to level {level + 1}
             </p>
           </div>
         </div>
       </Card>
       
-      {stats.map((stat, index) => (
+      {statsData.map((stat, index) => (
         <Card key={stat.label} className="p-4 hover:shadow-lg transition-shadow border-l-4 border-l-primary">
           <div className="flex items-center justify-between">
             <div>

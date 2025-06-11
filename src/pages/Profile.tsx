@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
@@ -14,12 +15,18 @@ import { Calendar, MapPin, Target, Trophy, Edit, Settings, Plus, X } from 'lucid
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { usePosts } from '@/hooks/usePosts';
+import { useUserStats } from '@/hooks/useUserStats';
+import { useGymBuddies } from '@/hooks/useGymBuddies';
+import { useCommunities } from '@/hooks/useCommunities';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { profile, loading: profileLoading, updateProfile } = useProfile();
+  const { profile, loading: profileLoading } = useProfile();
   const { posts, loading: postsLoading } = usePosts();
+  const { stats, loading: statsLoading } = useUserStats();
+  const { buddies } = useGymBuddies();
+  const { communities } = useCommunities();
   const [showSessionCreator, setShowSessionCreator] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -34,7 +41,7 @@ const Profile = () => {
     setShowSessionCreator(false);
   };
 
-  if (profileLoading) {
+  if (profileLoading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-energy-orange"></div>
@@ -62,6 +69,12 @@ const Profile = () => {
 
   // Filter posts by current user
   const userPosts = posts.filter(post => post.author_id === profile.id);
+
+  // Calculate level and XP from stats
+  const level = stats?.level || 1;
+  const currentXP = stats?.xp || 0;
+  const nextLevelXP = level * 100;
+  const xpProgress = Math.min((currentXP / nextLevelXP) * 100, 100);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -130,13 +143,13 @@ const Profile = () => {
                 {profile.age && `${profile.age} years old`} {profile.gender && `• ${profile.gender}`}
               </p>
               
-              {/* Level & XP - Static for now */}
+              {/* Level & XP */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-energy-yellow">Level 1</span>
-                  <span className="text-sm text-muted-foreground">0/100 XP</span>
+                  <span className="font-semibold text-energy-yellow">Level {level}</span>
+                  <span className="text-sm text-muted-foreground">{currentXP}/{nextLevelXP} XP</span>
                 </div>
-                <Progress value={0} className="h-2" />
+                <Progress value={xpProgress} className="h-2" />
               </div>
 
               {profile.bio && <p className="text-sm text-foreground mb-4">{profile.bio}</p>}
@@ -155,7 +168,7 @@ const Profile = () => {
               </div>
             </Card>
 
-            {/* Stats Card - Static for now */}
+            {/* Stats Card */}
             <Card className="p-6">
               <h3 className="text-lg font-bold mb-4 text-center bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
                 Fitness Stats
@@ -163,19 +176,21 @@ const Profile = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Workouts</span>
-                  <span className="font-bold text-planet-purple">0</span>
+                  <span className="font-bold text-planet-purple">{stats?.workouts_completed || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Hours Exercised</span>
-                  <span className="font-bold text-planet-purple">0h 0m</span>
+                  <span className="font-bold text-planet-purple">
+                    {Math.floor((stats?.total_exercise_hours || 0) / 60)}h {(stats?.total_exercise_hours || 0) % 60}m
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Gym Buddies</span>
-                  <span className="font-bold text-planet-purple">0</span>
+                  <span className="font-bold text-planet-purple">{buddies?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Communities</span>
-                  <span className="font-bold text-planet-purple">0</span>
+                  <span className="font-bold text-planet-purple">{communities?.length || 0}</span>
                 </div>
               </div>
             </Card>
@@ -283,6 +298,7 @@ const Profile = () => {
                         content: post.content,
                         likes: post.post_likes.length,
                         comments: post.post_comments.length,
+                        postLikes: post.post_likes,
                         ...(post.media_url && { media: { type: post.media_type as 'image' | 'video', url: post.media_url } })
                       }} 
                     />
