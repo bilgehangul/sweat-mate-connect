@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Users } from 'lucide-react';
 import { useWorkoutSessions } from '@/hooks/useWorkoutSessions';
 import { useToast } from '@/hooks/use-toast';
+import GymLocationSelector from './GymLocationSelector';
 
 interface SessionCreatorProps {
   onCreateSession: (sessionData: any) => void;
@@ -117,12 +118,9 @@ const SessionCreator = ({ onCreateSession }: SessionCreatorProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="gym_location">Gym Location</Label>
-            <Input
-              id="gym_location"
+            <GymLocationSelector
               value={formData.gym_location}
-              onChange={(e) => setFormData({...formData, gym_location: e.target.value})}
-              placeholder="e.g., Gold's Gym Downtown"
-              required
+              onValueChange={(value) => setFormData({...formData, gym_location: value})}
             />
           </div>
           

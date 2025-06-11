@@ -1,248 +1,166 @@
+
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
-import { useNavigate } from 'react-router-dom';
+import CommunityCreator from '@/components/CommunityCreator';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Users, Plus, Crown, Calendar, MapPin, Search } from 'lucide-react';
+import { Users, Lock, Unlock, UserPlus, UserMinus } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCommunities } from '@/hooks/useCommunities';
+import { useCommunityActions } from '@/hooks/useCommunityActions';
+import { useToast } from '@/hooks/use-toast';
 
 const Communities = () => {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const joinedCommunities = [
-    {
-      id: 1,
-      name: 'Early Birds Crew',
-      members: 156,
-      image: '🌅',
-      isOwner: false,
-      nextEvent: 'Tomorrow 6:00 AM'
-    },
-    {
-      id: 3,
-      name: 'CrossFit Warriors',
-      members: 97,
-      image: '⚡',
-      isOwner: true,
-      nextEvent: 'Friday 7:00 PM'
-    }
-  ];
-
-  const availableCommunities = [
-    {
-      id: 2,
-      name: 'Women Who Lift',
-      description: 'Empowering women in strength training. All levels welcome!',
-      members: 284,
-      image: '💪',
-      category: 'Gender-specific',
-      gym: 'Multiple Locations',
-      nextEvent: 'Saturday 10:00 AM - Deadlift Workshop'
-    },
-    {
-      id: 4,
-      name: 'Yoga & Mindfulness',
-      description: 'Balance your fitness with yoga, meditation, and wellness.',
-      members: 203,
-      image: '🧘',
-      category: 'Wellness',
-      gym: 'Zen Fitness Studio',
-      nextEvent: 'Sunday 9:00 AM - Sunrise Yoga'
-    },
-    {
-      id: 5,
-      name: 'Powerlifting Club',
-      description: 'Serious strength training for competitive lifters.',
-      members: 145,
-      image: '🏋️',
-      category: 'Strength',
-      gym: 'Iron Paradise Gym',
-      nextEvent: 'Monday 8:00 PM - Max Out Session'
-    }
-  ];
-
-  const handleLogout = () => {
-    navigate('/');
-  };
-
-  const filteredCommunities = availableCommunities.filter(community =>
-    community.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    community.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleJoin = (communityId: number) => {
-    console.log('Joining community:', communityId);
-  };
+  const { signOut } = useAuth();
+  const { communities, loading, refetch } = useCommunities();
+  const { joinCommunity, leaveCommunity, loading: actionLoading } = useCommunityActions();
+  const { toast } = useToast();
 
   const handleCreateCommunity = () => {
-    console.log('Creating new community');
+    refetch();
   };
 
-  const handleCommunityClick = (communityId: number) => {
-    navigate(`/communities/${communityId}`);
+  const handleJoinCommunity = async (communityId: string) => {
+    try {
+      await joinCommunity(communityId);
+      toast({
+        title: "Joined community!",
+        description: "Welcome to your new community.",
+      });
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error joining community",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
+
+  const handleLeaveCommunity = async (communityId: string) => {
+    try {
+      await leaveCommunity(communityId);
+      toast({
+        title: "Left community",
+        description: "You have successfully left the community.",
+      });
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error leaving community",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation isLoggedIn={true} onLogout={handleLogout} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-energy-orange mx-auto"></div>
+            <p className="text-muted-foreground mt-4">Loading communities...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation isLoggedIn={true} onLogout={handleLogout} />
       
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
-          {/* Left Sidebar - Joined Communities */}
-          <div className="lg:col-span-1">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent mb-6">
-              My Communities
-            </h2>
-            
-            <div className="space-y-4">
-              {joinedCommunities.map((community) => (
-                <Card 
-                  key={community.id} 
-                  className="p-4 hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-planet-purple"
-                  onClick={() => handleCommunityClick(community.id)}
-                >
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="w-10 h-10 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center text-lg">
-                      {community.image}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-4">
+            Communities
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Join fitness communities and connect with like-minded people
+          </p>
+        </div>
+
+        <CommunityCreator onCreateCommunity={handleCreateCommunity} />
+
+        {communities.length === 0 ? (
+          <Card className="p-8 text-center">
+            <h3 className="text-xl font-bold mb-4">No communities found</h3>
+            <p className="text-muted-foreground mb-6">
+              Be the first to create a community and start building your fitness network!
+            </p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {communities.map((community) => (
+              <Card key={community.id} className="p-6 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center">
+                      {community.avatar_url ? (
+                        <img 
+                          src={community.avatar_url} 
+                          alt={community.name} 
+                          className="w-full h-full rounded-full object-cover" 
+                        />
+                      ) : (
+                        <Users className="w-6 h-6 text-white" />
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-1">
-                        <h3 className="font-bold text-sm">{community.name}</h3>
-                        {community.isOwner && (
-                          <Crown className="w-3 h-3 text-energy-yellow" />
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                        <Users className="w-3 h-3" />
-                        <span>{community.members}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3 inline mr-1" />
-                    {community.nextEvent}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Middle - Search and Available Communities */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
-                Discover Communities
-              </h1>
-            </div>
-
-            {/* Search Bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search communities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Available Communities */}
-            <div className="space-y-4">
-              {filteredCommunities.map((community) => (
-                <Card 
-                  key={community.id} 
-                  className="p-6 hover:shadow-lg transition-all duration-300 cursor-pointer"
-                  onClick={() => handleCommunityClick(community.id)}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center text-2xl">
-                        {community.image}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold">{community.name}</h3>
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                          <Users className="w-4 h-4" />
-                          <span>{community.members} members</span>
-                          <span>•</span>
-                          <span>{community.category}</span>
-                        </div>
+                    <div>
+                      <h3 className="text-lg font-bold">{community.name}</h3>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Users className="w-3 h-3 mr-1" />
+                        {community.member_count} members
                       </div>
                     </div>
                   </div>
+                  {community.is_private ? (
+                    <Lock className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <Unlock className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </div>
 
-                  <p className="text-foreground mb-4">
+                {community.description && (
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                     {community.description}
                   </p>
+                )}
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {community.gym}
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {community.nextEvent}
-                    </div>
-                  </div>
+                <div className="text-xs text-muted-foreground mb-4">
+                  Created {new Date(community.created_at).toLocaleDateString()}
+                </div>
 
-                  <Button 
-                    className="w-full planet-gradient text-white hover:scale-105 transition-transform"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleJoin(community.id);
-                    }}
+                {community.is_member ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => handleLeaveCommunity(community.id)}
+                    disabled={actionLoading}
+                    className="w-full hover:bg-destructive hover:text-destructive-foreground"
                   >
+                    <UserMinus className="w-4 h-4 mr-2" />
+                    Leave Community
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleJoinCommunity(community.id)}
+                    disabled={actionLoading}
+                    className="w-full gym-gradient text-white hover:scale-105 transition-transform"
+                  >
+                    <UserPlus className="w-4 h-4 mr-2" />
                     Join Community
                   </Button>
-                </Card>
-              ))}
-            </div>
+                )}
+              </Card>
+            ))}
           </div>
-
-          {/* Right Sidebar - Create Community */}
-          <div className="lg:col-span-1">
-            <Card className="p-6 bg-gradient-to-br from-planet-purple/10 to-energy-yellow/10 border-planet-purple/20">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-planet-purple to-energy-yellow rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Plus className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Create Your Own</h3>
-                <p className="text-muted-foreground text-sm mb-6">
-                  Start a community and bring together like-minded fitness enthusiasts
-                </p>
-                <Button 
-                  onClick={handleCreateCommunity}
-                  className="w-full planet-gradient text-white hover:scale-105 transition-transform"
-                >
-                  Create Community
-                </Button>
-              </div>
-            </Card>
-
-            {/* Quick Stats */}
-            <Card className="p-4 mt-6">
-              <h4 className="font-bold mb-4 text-center">Community Stats</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Total Communities</span>
-                  <span className="font-bold text-planet-purple">150+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Active Members</span>
-                  <span className="font-bold text-planet-purple">5,000+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Weekly Meetups</span>
-                  <span className="font-bold text-planet-purple">200+</span>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-        </div>
+        )}
       </div>
     </div>
   );
