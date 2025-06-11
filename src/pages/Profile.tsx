@@ -2,18 +2,37 @@
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import ProfileEditForm from '@/components/ProfileEditForm';
+import SessionCreator from '@/components/SessionCreator';
+import CreatePostForm from '@/components/CreatePostForm';
+import FeedPost from '@/components/FeedPost';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, LogOut } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Edit, LogOut, Plus, X, Calendar, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserStats } from '@/hooks/useUserStats';
+import { usePosts } from '@/hooks/usePosts';
+import { useToast } from '@/hooks/use-toast';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { stats, loading: statsLoading } = useUserStats();
+  const { posts, loading: postsLoading } = usePosts();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [showSessionCreator, setShowSessionCreator] = useState(false);
+  const [showCreatePost, setShowCreatePost] = useState(false);
+
+  const handleCreateSession = (sessionData: any) => {
+    console.log('Creating session:', sessionData);
+    setShowSessionCreator(false);
+    toast({
+      title: "Session created successfully!",
+      description: "Your workout session has been created."
+    });
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -37,9 +56,45 @@ const Profile = () => {
     ? `${profile.first_name} ${profile.last_name}`
     : profile?.username || 'User';
 
+  const userPosts = posts.filter(post => post.author_id === user?.id);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation isLoggedIn={true} onLogout={handleLogout} />
+
+      {/* Session Creator Modal */}
+      {showSessionCreator && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
+                  Create Your Workout Session
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSessionCreator(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <SessionCreator onCreateSession={handleCreateSession} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Post Modal */}
+      {showCreatePost && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <CreatePostForm onClose={() => setShowCreatePost(false)} />
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
@@ -119,6 +174,69 @@ const Profile = () => {
               <div className="text-muted-foreground">Fitness Ranking</div>
             </Card>
           </div>
+
+          {/* Tabs Section */}
+          <Card className="p-6">
+            <Tabs defaultValue="workouts" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="workouts">Workout History</TabsTrigger>
+                <TabsTrigger value="posts">My Posts</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="workouts" className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Your Workout Sessions</h3>
+                  <Button onClick={() => setShowSessionCreator(true)} className="gym-gradient text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Session
+                  </Button>
+                </div>
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No workout sessions yet. Create your first session to get started!</p>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="posts" className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Your Posts</h3>
+                  <Button onClick={() => setShowCreatePost(true)} className="gym-gradient text-white">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Post
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  {postsLoading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-energy-orange mx-auto"></div>
+                      <p className="text-muted-foreground mt-2">Loading posts...</p>
+                    </div>
+                  ) : userPosts.length > 0 ? (
+                    userPosts.map((post) => (
+                      <FeedPost 
+                        key={post.id} 
+                        post={{
+                          id: parseInt(post.id),
+                          user: `${post.profiles.first_name || ''} ${post.profiles.last_name || ''}`.trim() || post.profiles.username || 'Unknown User',
+                          avatar: post.profiles.avatar_url || '👤',
+                          time: new Date(post.created_at).toLocaleDateString(),
+                          content: post.content,
+                          likes: post.post_likes.length,
+                          comments: post.post_comments.length,
+                          ...(post.media_url && { media: { type: post.media_type as 'image' | 'video', url: post.media_url } })
+                        }} 
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No posts yet. Share your fitness journey with your first post!</p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </Card>
 
           {/* Profile Details */}
           <Card className="p-6">

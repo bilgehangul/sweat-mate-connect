@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import SessionRequestCard from '@/components/SessionRequestCard';
+import SessionCreator from '@/components/SessionCreator';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,24 +10,24 @@ import { useMatches } from '@/hooks/useMatches';
 import { useSessionRequests } from '@/hooks/useSessionRequests';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+
 const Matches = () => {
   const navigate = useNavigate();
-  const {
-    signOut
-  } = useAuth();
-  const {
-    matches,
-    loading: matchesLoading,
-    updateMatchStatus
-  } = useMatches();
-  const {
-    requests,
-    loading: requestsLoading,
-    respondToRequest
-  } = useSessionRequests();
-  const {
-    toast
-  } = useToast();
+  const { signOut } = useAuth();
+  const { matches, loading: matchesLoading, updateMatchStatus } = useMatches();
+  const { requests, loading: requestsLoading, respondToRequest } = useSessionRequests();
+  const { toast } = useToast();
+  const [showSessionCreator, setShowSessionCreator] = useState(false);
+
+  const handleCreateSession = (sessionData: any) => {
+    console.log('Creating session:', sessionData);
+    setShowSessionCreator(false);
+    toast({
+      title: "Session created successfully!",
+      description: "Your workout session has been created."
+    });
+  };
+
   const handleAccept = async (matchId: string) => {
     try {
       await updateMatchStatus(matchId, 'accepted');
@@ -109,6 +110,29 @@ const Matches = () => {
   return <div className="min-h-screen bg-background">
       <Navigation isLoggedIn={true} onLogout={handleLogout} />
       
+      {/* Session Creator Modal */}
+      {showSessionCreator && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-planet-purple to-energy-yellow bg-clip-text text-transparent">
+                  Create Your Workout Session
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSessionCreator(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <SessionCreator onCreateSession={handleCreateSession} />
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-4">
@@ -129,7 +153,7 @@ const Matches = () => {
 
         {/* Create Session Button */}
         <div className="text-center mb-8">
-          <Button onClick={() => navigate('/dashboard')} size="lg" className="gym-gradient text-white energy-glow hover:scale-105 transition-transform px-8 py-4 text-lg font-semibold rounded-full">
+          <Button onClick={() => setShowSessionCreator(true)} size="lg" className="gym-gradient text-white energy-glow hover:scale-105 transition-transform px-8 py-4 text-lg font-semibold rounded-full">
             <Plus className="w-5 h-5 mr-2" />
             CREATE SESSION
           </Button>
@@ -137,9 +161,16 @@ const Matches = () => {
 
         {/* Matches Section */}
         {matches.length === 0 ? <Card className="p-8 text-center">
-            
-            
-            
+            <div className="text-center">
+              <div className="text-6xl mb-4">🎯</div>
+              <h3 className="text-xl font-bold mb-2">No matches yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Create a workout session to start finding your perfect gym buddy!
+              </p>
+              <Button onClick={() => setShowSessionCreator(true)} className="gym-gradient text-white">
+                Create Your First Session
+              </Button>
+            </div>
           </Card> : <div>
             <h2 className="text-2xl font-bold mb-4">Your Matches</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -207,4 +238,5 @@ const Matches = () => {
       </div>
     </div>;
 };
+
 export default Matches;
