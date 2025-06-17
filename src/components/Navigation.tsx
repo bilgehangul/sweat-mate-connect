@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -31,9 +30,9 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
         { name: 'Profile', path: '/profile' }
       ]
     : [
-        { name: 'Supported Gyms', path: '#gyms' },
         { name: 'How it works', path: '#how' },
         { name: 'Why use it', path: '#why' },
+        { name: 'Supported Gyms', path: '#gyms' },
         { name: 'Safety', path: '#safety' }
       ];
 
