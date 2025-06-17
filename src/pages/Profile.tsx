@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,11 @@ const Profile = () => {
   const { profile, loading } = useProfile();
   const [isEditing, setIsEditing] = useState(false);
   const [showSessionCreator, setShowSessionCreator] = useState(false);
+
+  const handleSessionCreated = (sessionData: any) => {
+    console.log('Session created:', sessionData);
+    setShowSessionCreator(false);
+  };
 
   if (loading) {
     return (
@@ -182,7 +186,7 @@ const Profile = () => {
                   <h2 className="text-2xl font-bold">Create Workout Session</h2>
                   <Button variant="ghost" onClick={() => setShowSessionCreator(false)}>×</Button>
                 </div>
-                <SessionCreator />
+                <SessionCreator onCreateSession={handleSessionCreated} />
               </div>
             </div>
           </div>
