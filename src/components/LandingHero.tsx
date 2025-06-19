@@ -240,14 +240,14 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
+      {/* Features Section - Fixed spacing and padding */}
+      <section className="py-24 bg-white relative">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-8 leading-tight">
               Why Choose GymBuddy?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               We've revolutionized how fitness enthusiasts connect and achieve their goals together
             </p>
           </div>
@@ -267,7 +267,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-r from-gray-50 to-blue-50">
+      <section className="py-24 bg-gradient-to-r from-gray-50 to-blue-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">What Our Community Says</h2>
@@ -315,7 +315,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* Supported Gyms Section */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-neon-green to-energy-orange bg-clip-text text-transparent mb-6">
@@ -361,7 +361,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-energy-orange via-electric-blue to-neon-green relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-r from-energy-orange via-electric-blue to-neon-green relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
