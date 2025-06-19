@@ -47,18 +47,34 @@ const CommunityDetail = () => {
   const fetchCommunity = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // First, fetch the community details with profiles
+      const { data: communityData, error: communityError } = await supabase
         .from('communities')
         .select(`
           *,
-          profiles (first_name, last_name, username, avatar_url),
-          community_settings (*)
+          profiles (first_name, last_name, username, avatar_url)
         `)
         .eq('id', id)
         .single();
 
-      if (error) throw error;
-      setCommunity(data);
+      if (communityError) throw communityError;
+
+      // Then, separately fetch the community settings
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('community_settings')
+        .select('*')
+        .eq('community_id', id);
+
+      if (settingsError) throw settingsError;
+
+      // Combine the results
+      const combinedData = {
+        ...communityData,
+        community_settings: settingsData || []
+      };
+
+      setCommunity(combinedData);
     } catch (err: any) {
       console.error('Error fetching community:', err);
       toast({
