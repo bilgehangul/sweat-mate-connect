@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
-import FeedPost from '@/components/FeedPost';
 import CommunityManagementModal from '@/components/CommunityManagementModal';
+import CommunityPostForm from '@/components/CommunityPostForm';
+import CommunityMeetupForm from '@/components/CommunityMeetupForm';
+import CommunitySurveyForm from '@/components/CommunitySurveyForm';
+import CommunityCustomizationForm from '@/components/CommunityCustomizationForm';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Calendar, MapPin, MessageSquare, BarChart3, UserPlus, Settings, Crown, Shield } from 'lucide-react';
+import { Users, Calendar, MapPin, MessageSquare, BarChart3, UserPlus, Settings, Crown, Shield, Plus, Pin, Trash2, Video, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCommunityMembers } from '@/hooks/useCommunityMembers';
+import { useCommunityPosts } from '@/hooks/useCommunityPosts';
+import { useCommunityMeetups } from '@/hooks/useCommunityMeetups';
+import { useCommunitySurveys } from '@/hooks/useCommunitySurveys';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,9 +27,16 @@ const CommunityDetail = () => {
   
   const [community, setCommunity] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [newPost, setNewPost] = useState('');
   const [showManagement, setShowManagement] = useState(false);
+  const [showPostForm, setShowPostForm] = useState(false);
+  const [showMeetupForm, setShowMeetupForm] = useState(false);
+  const [showSurveyForm, setShowSurveyForm] = useState(false);
+  const [showCustomization, setShowCustomization] = useState(false);
+  
   const { members, userRole, loading: membersLoading } = useCommunityMembers(id || '');
+  const { posts, loading: postsLoading, pinPost, deletePost } = useCommunityPosts(id || '');
+  const { meetups, loading: meetupsLoading, joinMeetup, leaveMeetup } = useCommunityMeetups(id || '');
+  const { surveys, loading: surveysLoading, respondToSurvey } = useCommunitySurveys(id || '');
 
   useEffect(() => {
     if (id) {
@@ -40,7 +51,8 @@ const CommunityDetail = () => {
         .from('communities')
         .select(`
           *,
-          profiles (first_name, last_name, username, avatar_url)
+          profiles (first_name, last_name, username, avatar_url),
+          community_settings (*)
         `)
         .eq('id', id)
         .single();
@@ -63,20 +75,16 @@ const CommunityDetail = () => {
     navigate('/');
   };
 
-  const handleCreatePost = async () => {
-    if (!newPost.trim()) return;
-
+  const handleSurveyResponse = async (surveyId: string, optionId: string) => {
     try {
-      // TODO: Implement community posts functionality
-      console.log('Creating post:', newPost);
-      setNewPost('');
+      await respondToSurvey(surveyId, [optionId]);
       toast({
-        title: "Post created!",
-        description: "Your post has been shared with the community.",
+        title: "Response recorded",
+        description: "Thank you for participating in the survey!",
       });
     } catch (error: any) {
       toast({
-        title: "Error creating post",
+        title: "Error submitting response",
         description: error.message,
         variant: "destructive",
       });
@@ -85,6 +93,7 @@ const CommunityDetail = () => {
 
   const isOwner = community?.creator_id === user?.id;
   const canManage = userRole === 'admin' || userRole === 'moderator';
+  const canPost = userRole !== null;
 
   if (loading) {
     return (
@@ -138,54 +147,25 @@ const CommunityDetail = () => {
     }
   };
 
-  // Mock data for demonstration
-  const meetups = [
-    {
-      id: 1,
-      title: 'Friday Night WOD',
-      date: 'Dec 15, 2024',
-      time: '7:00 PM',
-      location: 'CrossFit Downtown',
-      attendees: 12,
-      description: 'High-intensity workout focusing on Olympic lifts and conditioning.'
-    }
-  ];
-
-  const surveys = [
-    {
-      id: 1,
-      title: 'What time works best for weekend workouts?',
-      options: ['8:00 AM', '10:00 AM', '2:00 PM', '6:00 PM'],
-      votes: [15, 23, 8, 12],
-      totalVotes: 58
-    }
-  ];
-
-  const feedPosts = [
-    {
-      id: 1,
-      user: community.profiles?.first_name && community.profiles?.last_name 
-        ? `${community.profiles.first_name} ${community.profiles.last_name}`
-        : community.profiles?.username || 'Community Owner',
-      avatar: community.profiles?.avatar_url || '👨‍💼',
-      time: '2 hours ago',
-      content: 'Welcome to our community! Looking forward to connecting with everyone.',
-      likes: 15,
-      comments: 6
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation isLoggedIn={true} onLogout={handleLogout} />
       
       <div className="container mx-auto px-4 py-8">
         {/* Community Header */}
-        <Card className="p-6 mb-8">
+        <Card className="p-6 mb-8" style={{
+          backgroundColor: community.community_settings?.[0]?.primary_color ? `${community.community_settings[0].primary_color}10` : undefined
+        }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center text-3xl">
-                {community.avatar_url ? (
+                {community.community_settings?.[0]?.logo_url ? (
+                  <img 
+                    src={community.community_settings[0].logo_url} 
+                    alt={community.name} 
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : community.avatar_url ? (
                   <img 
                     src={community.avatar_url} 
                     alt={community.name} 
@@ -219,6 +199,15 @@ const CommunityDetail = () => {
             </div>
             
             <div className="flex space-x-2">
+              {isOwner && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCustomization(true)}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Customize
+                </Button>
+              )}
               {canManage && (
                 <Button
                   variant="outline"
@@ -240,6 +229,13 @@ const CommunityDetail = () => {
           {community.description && (
             <p className="text-foreground">{community.description}</p>
           )}
+          
+          {community.community_settings?.[0]?.welcome_message && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+              <h3 className="font-semibold mb-2">Welcome Message</h3>
+              <p className="text-sm">{community.community_settings[0].welcome_message}</p>
+            </div>
+          )}
         </Card>
 
         <Tabs defaultValue="feed" className="w-full">
@@ -252,35 +248,107 @@ const CommunityDetail = () => {
           </TabsList>
 
           <TabsContent value="feed" className="space-y-6">
-            {/* Create Post */}
-            {userRole && (
-              <Card className="p-4">
-                <div className="flex space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full"></div>
-                  <div className="flex-1">
-                    <Textarea
-                      placeholder="Share something with the community..."
-                      value={newPost}
-                      onChange={(e) => setNewPost(e.target.value)}
-                      className="mb-3"
-                      rows={3}
-                    />
-                    <Button 
-                      onClick={handleCreatePost}
-                      disabled={!newPost.trim()}
-                      className="gym-gradient text-white"
-                    >
-                      Post
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+            {/* Create Post Button */}
+            {canPost && (
+              <div className="text-center">
+                <Button 
+                  onClick={() => setShowPostForm(true)}
+                  className="gym-gradient text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Post
+                </Button>
+              </div>
             )}
 
-            {/* Feed Posts */}
-            {feedPosts.map((post) => (
-              <FeedPost key={post.id} post={post} />
-            ))}
+            {/* Posts */}
+            {postsLoading ? (
+              <div className="text-center py-8">Loading posts...</div>
+            ) : posts.length === 0 ? (
+              <Card className="p-8 text-center">
+                <h3 className="text-lg font-semibold mb-2">No posts yet</h3>
+                <p className="text-muted-foreground">Be the first to share something with the community!</p>
+              </Card>
+            ) : (
+              posts.map((post) => {
+                const displayName = post.profiles.first_name && post.profiles.last_name
+                  ? `${post.profiles.first_name} ${post.profiles.last_name}`
+                  : post.profiles.username || 'Unknown User';
+
+                return (
+                  <Card key={post.id} className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center">
+                          {post.profiles.avatar_url ? (
+                            <img 
+                              src={post.profiles.avatar_url} 
+                              alt="Avatar" 
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-white font-semibold">
+                              {displayName.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold">{displayName}</h4>
+                            {post.is_pinned && <Pin className="w-4 h-4 text-yellow-500" />}
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(post.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {(canManage || post.author_id === user?.id) && (
+                        <div className="flex space-x-2">
+                          {canManage && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => pinPost(post.id, !post.is_pinned)}
+                            >
+                              <Pin className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deletePost(post.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <p className="text-foreground mb-4">{post.content}</p>
+                    
+                    {post.media_url && (
+                      <div className="mb-4">
+                        {post.media_type === 'image' ? (
+                          <img 
+                            src={post.media_url} 
+                            alt="Post media" 
+                            className="rounded-lg max-w-full h-auto"
+                          />
+                        ) : post.media_type === 'video' ? (
+                          <video 
+                            src={post.media_url} 
+                            className="rounded-lg max-w-full h-auto" 
+                            controls
+                          />
+                        ) : null}
+                      </div>
+                    )}
+                  </Card>
+                );
+              })
+            )}
           </TabsContent>
 
           <TabsContent value="members">
@@ -329,90 +397,208 @@ const CommunityDetail = () => {
           <TabsContent value="meetups">
             <div className="space-y-4">
               {canManage && (
-                <Card className="p-4 border-dashed border-2">
-                  <div className="text-center">
-                    <Calendar className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <h3 className="font-semibold mb-2">Create a Meetup</h3>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      Organize in-person events for your community members
-                    </p>
-                    <Button className="gym-gradient text-white">
-                      Create Meetup
-                    </Button>
-                  </div>
-                </Card>
+                <div className="text-center">
+                  <Button 
+                    onClick={() => setShowMeetupForm(true)}
+                    className="gym-gradient text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Meetup
+                  </Button>
+                </div>
               )}
               
-              {meetups.map((meetup) => (
-                <Card key={meetup.id} className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold mb-2">{meetup.title}</h3>
-                      <div className="space-y-1 text-muted-foreground">
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4" />
-                          <span>{meetup.date} at {meetup.time}</span>
+              {meetupsLoading ? (
+                <div className="text-center py-8">Loading meetups...</div>
+              ) : meetups.length === 0 ? (
+                <Card className="p-8 text-center">
+                  <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">No meetups scheduled</h3>
+                  <p className="text-muted-foreground">
+                    {canManage ? "Create the first meetup for your community!" : "Check back later for upcoming events."}
+                  </p>
+                </Card>
+              ) : (
+                meetups.map((meetup) => {
+                  const organizerName = meetup.profiles.first_name && meetup.profiles.last_name
+                    ? `${meetup.profiles.first_name} ${meetup.profiles.last_name}`
+                    : meetup.profiles.username || 'Unknown User';
+
+                  return (
+                    <Card key={meetup.id} className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-bold mb-2">{meetup.title}</h3>
+                          <p className="text-muted-foreground mb-3">{meetup.description}</p>
+                          <div className="space-y-1 text-sm text-muted-foreground">
+                            <div className="flex items-center space-x-2">
+                              <Calendar className="w-4 h-4" />
+                              <span>{new Date(meetup.event_date).toLocaleDateString()} at {meetup.start_time}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {meetup.is_virtual ? (
+                                <>
+                                  <Video className="w-4 h-4" />
+                                  <span>Virtual Event</span>
+                                  {meetup.meeting_link && (
+                                    <a 
+                                      href={meetup.meeting_link} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-blue-500 hover:underline flex items-center gap-1"
+                                    >
+                                      <ExternalLink className="w-3 h-3" />
+                                      Join
+                                    </a>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <MapPin className="w-4 h-4" />
+                                  <span>{meetup.location}</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Users className="w-4 h-4" />
+                              <span>
+                                {meetup.current_attendees} attending
+                                {meetup.max_attendees && ` (max ${meetup.max_attendees})`}
+                              </span>
+                            </div>
+                            <p className="text-xs">Organized by {organizerName}</p>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>{meetup.location}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Users className="w-4 h-4" />
-                          <span>{meetup.attendees} attending</span>
+                        
+                        <div className="flex flex-col space-y-2">
+                          {meetup.user_attendance ? (
+                            <div className="space-y-2">
+                              <Badge className="bg-green-100 text-green-800">
+                                {meetup.user_attendance.status}
+                              </Badge>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => leaveMeetup(meetup.id)}
+                              >
+                                Leave
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              onClick={() => joinMeetup(meetup.id)}
+                              className="gym-gradient text-white"
+                              disabled={meetup.max_attendees ? meetup.current_attendees >= meetup.max_attendees : false}
+                            >
+                              {meetup.max_attendees && meetup.current_attendees >= meetup.max_attendees 
+                                ? 'Full' 
+                                : 'Join'
+                              }
+                            </Button>
+                          )}
                         </div>
                       </div>
-                    </div>
-                    <Button className="gym-gradient text-white">Join Meetup</Button>
-                  </div>
-                  <p className="text-foreground">{meetup.description}</p>
-                </Card>
-              ))}
+                    </Card>
+                  );
+                })
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="surveys">
             <div className="space-y-4">
               {canManage && (
-                <Card className="p-4 border-dashed border-2">
-                  <div className="text-center">
-                    <BarChart3 className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <h3 className="font-semibold mb-2">Create a Survey</h3>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      Get feedback and opinions from your community
-                    </p>
-                    <Button className="gym-gradient text-white">
-                      Create Survey
-                    </Button>
-                  </div>
-                </Card>
+                <div className="text-center">
+                  <Button 
+                    onClick={() => setShowSurveyForm(true)}
+                    className="gym-gradient text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Survey
+                  </Button>
+                </div>
               )}
               
-              {surveys.map((survey) => (
-                <Card key={survey.id} className="p-6">
-                  <h3 className="text-xl font-bold mb-4 flex items-center">
-                    <BarChart3 className="w-5 h-5 mr-2" />
-                    {survey.title}
-                  </h3>
-                  <div className="space-y-3">
-                    {survey.options.map((option, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span>{option}</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-32 h-2 bg-gray-200 rounded-full">
-                            <div 
-                              className="h-2 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full" 
-                              style={{ width: `${(survey.votes[index] / survey.totalVotes) * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-sm text-muted-foreground">{survey.votes[index]}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-4">{survey.totalVotes} total votes</p>
+              {surveysLoading ? (
+                <div className="text-center py-8">Loading surveys...</div>
+              ) : surveys.length === 0 ? (
+                <Card className="p-8 text-center">
+                  <BarChart3 className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">No surveys yet</h3>
+                  <p className="text-muted-foreground">
+                    {canManage ? "Create a survey to get feedback from your community!" : "Check back later for community polls."}
+                  </p>
                 </Card>
-              ))}
+              ) : (
+                surveys.map((survey) => {
+                  const creatorName = survey.profiles.first_name && survey.profiles.last_name
+                    ? `${survey.profiles.first_name} ${survey.profiles.last_name}`
+                    : survey.profiles.username || 'Unknown User';
+
+                  const hasResponded = survey.user_responses && survey.user_responses.length > 0;
+
+                  return (
+                    <Card key={survey.id} className="p-6">
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold mb-2 flex items-center">
+                          <BarChart3 className="w-5 h-5 mr-2" />
+                          {survey.title}
+                        </h3>
+                        {survey.description && (
+                          <p className="text-muted-foreground mb-3">{survey.description}</p>
+                        )}
+                        <p className="text-sm text-muted-foreground">
+                          By {creatorName} • {survey.total_responses} responses
+                          {survey.expires_at && (
+                            <span> • Expires {new Date(survey.expires_at).toLocaleDateString()}</span>
+                          )}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {survey.survey_options.map((option) => {
+                          const percentage = survey.total_responses > 0 
+                            ? (option.vote_count / survey.total_responses) * 100 
+                            : 0;
+
+                          return (
+                            <div key={option.id} className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm">{option.option_text}</span>
+                                <span className="text-sm text-muted-foreground">
+                                  {option.vote_count} ({percentage.toFixed(1)}%)
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-gradient-to-r from-energy-orange to-electric-blue h-2 rounded-full transition-all duration-300" 
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                              {!hasResponded && survey.is_active && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleSurveyResponse(survey.id, option.id)}
+                                  className="w-full mt-2"
+                                >
+                                  Vote for this option
+                                </Button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {hasResponded && (
+                        <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                          <p className="text-sm text-green-700">✓ You have already responded to this survey</p>
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })
+              )}
             </div>
           </TabsContent>
 
@@ -430,7 +616,7 @@ const CommunityDetail = () => {
         </Tabs>
       </div>
 
-      {/* Community Management Modal */}
+      {/* Modals */}
       {community && (
         <CommunityManagementModal
           community={community}
@@ -441,6 +627,49 @@ const CommunityDetail = () => {
             setShowManagement(false);
           }}
         />
+      )}
+
+      {showPostForm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <CommunityPostForm
+            communityId={id!}
+            onClose={() => setShowPostForm(false)}
+            onSuccess={() => setShowPostForm(false)}
+          />
+        </div>
+      )}
+
+      {showMeetupForm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <CommunityMeetupForm
+            communityId={id!}
+            onClose={() => setShowMeetupForm(false)}
+            onSuccess={() => setShowMeetupForm(false)}
+          />
+        </div>
+      )}
+
+      {showSurveyForm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <CommunitySurveyForm
+            communityId={id!}
+            onClose={() => setShowSurveyForm(false)}
+            onSuccess={() => setShowSurveyForm(false)}
+          />
+        </div>
+      )}
+
+      {showCustomization && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <CommunityCustomizationForm
+            communityId={id!}
+            onClose={() => setShowCustomization(false)}
+            onSuccess={() => {
+              setShowCustomization(false);
+              fetchCommunity();
+            }}
+          />
+        </div>
       )}
     </div>
   );
