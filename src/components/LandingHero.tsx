@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Users, Target, Shield, Calendar, Play, Star, ArrowRight, Zap, Heart, Trophy, CheckCircle } from 'lucide-react';
@@ -10,22 +10,8 @@ interface LandingHeroProps {
 
 const LandingHero = ({ onSignup }: LandingHeroProps) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-    const nextTestimonial = () => {
-  setCurrentTestimonial((prev) =>
-    prev === testimonials.length - 1 ? 0 : prev + 1
-  );
-  resetInterval();
-};
-
-const prevTestimonial = () => {
-  setCurrentTestimonial((prev) =>
-    prev === 0 ? testimonials.length - 1 : prev - 1
-  );
-  resetInterval();
-};
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const testimonialIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
 
   const testimonials = [
     {
@@ -50,16 +36,38 @@ const prevTestimonial = () => {
       avatar: "🧘‍♀️"
     }
   ];
-  useEffect(() => {
-  resetInterval();
-  return () => {
+
+  const resetInterval = useCallback(() => {
     if (testimonialIntervalRef.current) {
       clearInterval(testimonialIntervalRef.current);
     }
+    testimonialIntervalRef.current = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+  }, [testimonials.length]);
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) =>
+      prev === testimonials.length - 1 ? 0 : prev + 1
+    );
+    resetInterval();
   };
-}, []);
 
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) =>
+      prev === 0 ? testimonials.length - 1 : prev - 1
+    );
+    resetInterval();
+  };
 
+  useEffect(() => {
+    resetInterval();
+    return () => {
+      if (testimonialIntervalRef.current) {
+        clearInterval(testimonialIntervalRef.current);
+      }
+    };
+  }, [resetInterval]);
 
   const features = [
     {
@@ -123,17 +131,6 @@ const prevTestimonial = () => {
       members: "2M+"
     }
   ];
-
-  const resetInterval = () => {
-  if (testimonialIntervalRef.current) {
-    clearInterval(testimonialIntervalRef.current);
-  }
-  testimonialIntervalRef.current = setInterval(() => {
-    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-  }, 4000);
-};
-
-
 
   return (
     <>
@@ -353,9 +350,9 @@ const prevTestimonial = () => {
                       index === currentTestimonial ? 'bg-energy-orange' : 'bg-gray-300'
                     }`}
                     onClick={() => {
-  setCurrentTestimonial(index);
-  resetInterval();
-}}
+                      setCurrentTestimonial(index);
+                      resetInterval();
+                    }}
                   />
                 ))}
               </div>
