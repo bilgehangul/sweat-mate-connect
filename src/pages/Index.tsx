@@ -24,8 +24,6 @@ const Index = () => {
       <div id="gyms">
         <SupportedGyms />
       </div>
-      
-      <Footer />
     </div>;
 };
 export default Index;
