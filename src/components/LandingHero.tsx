@@ -69,7 +69,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
   const gymLogos = [
     {
       name: "Planet Fitness",
-      logo: "https://logos-world.net/wp-content/uploads/2021/03/Planet-Fitness-Logo.png",
+      logo: "https://play.google.com/store/apps/details?id=com.planetfitness",
       members: "18.7M+"
     },
     {
@@ -85,7 +85,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
     {
       name: "Gold's Gym",
       logo: "https://logos-world.net/wp-content/uploads/2021/03/Golds-Gym-Logo.png",
-      members: "900K+"
+      members: "3M+"
     },
     {
       name: "Anytime Fitness",
@@ -95,7 +95,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
     {
       name: "Crunch Fitness",
       logo: "https://logos-world.net/wp-content/uploads/2021/03/Crunch-Fitness-Logo.png",
-      members: "600K+"
+      members: "2M+"
     }
   ];
 
