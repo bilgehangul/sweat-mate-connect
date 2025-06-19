@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +16,7 @@ interface Profile {
   experience_level: string | null;
   workout_goals: string[] | null;
   workout_preferences: string[] | null;
+  date_of_birth: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +49,27 @@ export const useProfile = () => {
         console.error('Error fetching profile:', error);
         setError(error.message);
       } else {
+        // Calculate age from date_of_birth if available
+        let calculatedAge = data.age;
+        if (data.date_of_birth && !data.age) {
+          const birthDate = new Date(data.date_of_birth);
+          const today = new Date();
+          calculatedAge = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            calculatedAge--;
+          }
+          
+          // Update the profile with calculated age
+          if (calculatedAge !== data.age) {
+            await supabase
+              .from('profiles')
+              .update({ age: calculatedAge })
+              .eq('id', user?.id);
+            data.age = calculatedAge;
+          }
+        }
+        
         setProfile(data);
       }
     } catch (err) {
@@ -61,6 +82,18 @@ export const useProfile = () => {
 
   const updateProfile = async (updates: Partial<Profile>) => {
     try {
+      // If date_of_birth is being updated, calculate age
+      if (updates.date_of_birth) {
+        const birthDate = new Date(updates.date_of_birth);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        updates.age = age;
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update(updates)
