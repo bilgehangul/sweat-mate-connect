@@ -70,12 +70,12 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
     {
       name: "Planet Fitness",
       logo: "https://logos-world.net/wp-content/uploads/2021/03/Planet-Fitness-Logo.png",
-      members: "2.1M+"
+      members: "18.7M+"
     },
     {
       name: "LA Fitness",
       logo: "https://logos-world.net/wp-content/uploads/2021/03/LA-Fitness-Logo.png",
-      members: "1.8M+"
+      members: "4.9M+"
     },
     {
       name: "24 Hour Fitness",
