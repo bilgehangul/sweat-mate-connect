@@ -27,7 +27,6 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
         { name: 'Home', path: '/dashboard' },
         { name: 'Matches', path: '/matches' },
         { name: 'Communities', path: '/communities' },
-        { name: 'Achievements', path: '/achievements' },
         { name: 'Profile', path: '/profile' }
       ]
     : [

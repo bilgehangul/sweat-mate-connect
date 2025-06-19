@@ -1,14 +1,17 @@
-
 import { Card } from '@/components/ui/card';
-import { Heart } from 'lucide-react';
-import { useUserStats } from '@/hooks/useUserStats';
-import { useGymBuddies } from '@/hooks/useGymBuddies';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Trophy, Target, Flame, Calendar, TrendingUp, Award } from 'lucide-react';
+import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
 
 const UserStats = () => {
-  const { stats, loading: statsLoading } = useUserStats();
-  const { buddies, loading: buddiesLoading } = useGymBuddies();
+  const { 
+    getWorkoutStats, 
+    getRecentLogs, 
+    loading: logsLoading 
+  } = useWorkoutLogs();
 
-  if (statsLoading || buddiesLoading) {
+  if (logsLoading) {
     return (
       <div className="space-y-4">
         <div className="animate-pulse">
@@ -21,50 +24,128 @@ const UserStats = () => {
     );
   }
 
+  const workoutStats = getWorkoutStats();
+  const recentLogs = getRecentLogs(7);
+  
+  // Calculate simple level based on total workouts
+  const totalPoints = workoutStats.totalWorkouts * 50; // 50 points per workout
+  const currentLevel = Math.floor(totalPoints / 100) + 1;
+
   const statsData = [
     {
-      label: 'Workouts Completed',
-      value: stats?.workouts_completed || 0,
-      icon: '💪',
-      color: 'text-energy-orange'
-    },
-    {
-      label: 'Ranking',
-      value: `${stats?.ranking || 0}/5`,
-      icon: '⭐',
+      label: 'Level',
+      value: currentLevel,
+      icon: <Award className="w-4 h-4 fill-current" />,
       color: 'text-yellow-500'
     },
     {
-      label: 'Hours Exercised',
-      value: `${Math.floor((stats?.total_exercise_hours || 0) / 60)}h ${(stats?.total_exercise_hours || 0) % 60}m`,
-      icon: '⏱️',
+      label: 'Total Workouts',
+      value: workoutStats.totalWorkouts,
+      icon: <Target className="w-4 h-4 fill-current" />,
       color: 'text-electric-blue'
     },
     {
-      label: 'Gym Buddies',
-      value: buddies?.length || 0,
-      icon: <Heart className="w-4 h-4 fill-current" />,
-      color: 'text-red-500'
+      label: 'This Week',
+      value: recentLogs.length,
+      icon: <Calendar className="w-4 h-4 fill-current" />,
+      color: 'text-neon-green'
+    },
+    {
+      label: 'Total Points',
+      value: totalPoints,
+      icon: <Trophy className="w-4 h-4 fill-current" />,
+      color: 'text-energy-orange'
     }
   ];
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent">
-        Your Stats
-      </h2>
-      
-      {statsData.map((stat, index) => (
-        <Card key={stat.label} className="p-4 hover:shadow-lg transition-shadow border-l-4 border-l-primary">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
-              <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-2">
+          Your Progress
+        </h2>
+        <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+          <Award className="w-3 h-3 mr-1" />
+          Level {currentLevel}
+        </Badge>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 gap-3">
+        {statsData.map((stat, index) => (
+          <Card key={stat.label} className="p-3 hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <p className={`text-lg font-bold ${stat.color}`}>{stat.value}</p>
+              </div>
+              <div className={`${stat.color}`}>{stat.icon}</div>
             </div>
-            <div className="text-2xl">{stat.icon}</div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Level Progress */}
+      <Card className="p-4">
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>Level Progress</span>
+            <span>{totalPoints % 100}/100 XP</span>
+          </div>
+          <Progress value={(totalPoints % 100)} className="h-2" />
+          <p className="text-xs text-muted-foreground text-center">
+            {100 - (totalPoints % 100)} XP to next level
+          </p>
+        </div>
+      </Card>
+
+      {/* Detailed Stats */}
+      {workoutStats.totalWorkouts > 0 && (
+        <Card className="p-4">
+          <h3 className="font-semibold mb-3 flex items-center">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Workout Stats
+          </h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Total Duration</p>
+              <p className="font-medium">{Math.floor(workoutStats.totalDuration / 60)}h {workoutStats.totalDuration % 60}m</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Calories Burned</p>
+              <p className="font-medium">{workoutStats.totalCalories.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Avg Difficulty</p>
+              <p className="font-medium">{workoutStats.averageDifficulty}/5</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Avg Satisfaction</p>
+              <p className="font-medium">{workoutStats.averageSatisfaction}/5</p>
+            </div>
           </div>
         </Card>
-      ))}
+      )}
+
+      {/* Recent Activity */}
+      {recentLogs.length > 0 && (
+        <Card className="p-4">
+          <h3 className="font-semibold mb-3 flex items-center">
+            <Flame className="w-4 h-4 mr-2" />
+            Recent Activity
+          </h3>
+          <div className="space-y-2">
+            {recentLogs.slice(0, 3).map((log) => (
+              <div key={log.id} className="flex justify-between items-center text-sm">
+                <span className="capitalize">{log.workout_type.replace('_', ' ')}</span>
+                <span className="text-muted-foreground">
+                  {new Date(log.workout_date).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
