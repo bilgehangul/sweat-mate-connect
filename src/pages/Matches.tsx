@@ -12,6 +12,7 @@ import { useSessionRequests } from '@/hooks/useSessionRequests';
 import { useWorkoutSessions } from '@/hooks/useWorkoutSessions';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import WorkoutSessionDisplay from '@/components/WorkoutSessionDisplay';
 
 const Matches = () => {
   const navigate = useNavigate();
@@ -201,6 +202,226 @@ const Matches = () => {
           </Button>
         </div>
 
+        {/* Your Sessions with Matches */}
+        {Object.keys(matchesBySession).length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Your Sessions with Matches</h2>
+            <div className="space-y-6">
+              {Object.entries(matchesBySession).map(([sessionId, sessionMatches]) => {
+                // Skip the "no-session" group if it exists
+                if (sessionId === 'no-session') return null;
+                
+                // Find session details
+                const session = sessions.find(s => s.id === sessionId);
+                if (!session) return null;
+                
+                // Add participants to session object
+                const sessionWithParticipants = {
+                  ...session,
+                  participants: sessionMatches.map(match => ({
+                    id: match.id,
+                    user_id: match.user1_id === session.creator_id ? match.user2_id : match.user1_id,
+                    status: match.status,
+                    joined_at: match.created_at,
+                    profiles: match.matched_user
+                  }))
+                };
+                
+                return (
+                  <div key={sessionId} className="mb-6">
+                    <WorkoutSessionDisplay 
+                      session={sessionWithParticipants}
+                      onSessionUpdate={() => {}}
+                      isCreator={true}
+                    />
+                    
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {sessionMatches.map(match => {
+                        const displayName = match.matched_user.first_name && match.matched_user.last_name 
+                          ? `${match.matched_user.first_name} ${match.matched_user.last_name}` 
+                          : match.matched_user.username || 'Unknown User';
+                        const matchPercentage = Math.round((match.match_score || 0.8) * 100);
+                        
+                        return (
+                          <Card key={match.id} className="p-4 hover:shadow-lg transition-all duration-300">
+                            <div className="flex items-center space-x-3 mb-3">
+                              <div className="w-12 h-12 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center text-xl">
+                                {match.matched_user.avatar_url ? (
+                                  <img 
+                                    src={match.matched_user.avatar_url} 
+                                    alt="Avatar" 
+                                    className="w-full h-full rounded-full object-cover" 
+                                  />
+                                ) : (
+                                  '👤'
+                                )}
+                              </div>
+                              <div>
+                                <h3 className="font-semibold">{displayName}</h3>
+                                <div className="flex items-center">
+                                  <Badge className={`text-xs ${
+                                    matchPercentage >= 90 ? 'bg-neon-green/20 text-neon-green' : 
+                                    matchPercentage >= 80 ? 'bg-energy-orange/20 text-energy-orange' : 
+                                    'bg-electric-blue/20 text-electric-blue'
+                                  }`}>
+                                    {matchPercentage}% Match
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {match.matched_user.bio && (
+                              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                                {match.matched_user.bio}
+                              </p>
+                            )}
+                            
+                            {match.status === 'pending' && (
+                              <div className="flex space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => handleDeny(match.id)} 
+                                  className="flex-1 hover:bg-destructive hover:text-destructive-foreground"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => handleChat(match.id)} 
+                                  className="flex-1 hover:bg-primary hover:text-primary-foreground"
+                                >
+                                  <MessageSquare className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  onClick={() => handleAccept(match.id)} 
+                                  className="flex-1 gym-gradient text-white hover:scale-105 transition-transform"
+                                >
+                                  <Heart className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            )}
+
+                            {match.status === 'accepted' && (
+                              <div className="text-center">
+                                <p className="text-green-600 font-semibold mb-2">✓ Matched!</p>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => handleChat(match.id)} 
+                                  className="w-full hover:bg-primary hover:text-primary-foreground"
+                                >
+                                  <MessageSquare className="w-4 h-4 mr-2" />
+                                  Chat
+                                </Button>
+                              </div>
+                            )}
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Matches without Sessions */}
+        {matchesBySession['no-session'] && matchesBySession['no-session'].length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Other Matches</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {matchesBySession['no-session'].map(match => {
+                const displayName = match.matched_user.first_name && match.matched_user.last_name 
+                  ? `${match.matched_user.first_name} ${match.matched_user.last_name}` 
+                  : match.matched_user.username || 'Unknown User';
+                const matchPercentage = Math.round((match.match_score || 0.8) * 100);
+                
+                return (
+                  <Card key={match.id} className="p-6 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                    <div className="text-center mb-4">
+                      <div className="w-20 h-20 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center text-3xl mx-auto mb-3">
+                        {match.matched_user.avatar_url ? (
+                          <img 
+                            src={match.matched_user.avatar_url} 
+                            alt="Avatar" 
+                            className="w-full h-full rounded-full object-cover" 
+                          />
+                        ) : (
+                          '👤'
+                        )}
+                      </div>
+                      <h3 className="text-xl font-bold">{displayName}</h3>
+                      {match.matched_user.age && <p className="text-muted-foreground">Age {match.matched_user.age}</p>}
+                      <div className="mt-2">
+                        <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                          matchPercentage >= 90 ? 'bg-neon-green/20 text-neon-green' : 
+                          matchPercentage >= 80 ? 'bg-energy-orange/20 text-energy-orange' : 
+                          'bg-electric-blue/20 text-electric-blue'
+                        }`}>
+                          {matchPercentage}% Match
+                        </span>
+                      </div>
+                    </div>
+
+                    {match.matched_user.bio && (
+                      <p className="text-sm text-foreground mb-6 line-clamp-3">
+                        {match.matched_user.bio}
+                      </p>
+                    )}
+
+                    {match.status === 'pending' && (
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleDeny(match.id)} 
+                          className="flex-1 hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleChat(match.id)} 
+                          className="flex-1 hover:bg-primary hover:text-primary-foreground"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleAccept(match.id)} 
+                          className="flex-1 gym-gradient text-white hover:scale-105 transition-transform"
+                        >
+                          <Heart className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+
+                    {match.status === 'accepted' && (
+                      <div className="text-center">
+                        <p className="text-green-600 font-semibold mb-2">✓ Matched!</p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleChat(match.id)} 
+                          className="w-full hover:bg-primary hover:text-primary-foreground"
+                        >
+                          <MessageSquare className="w-4 h-4 mr-2" />
+                          Chat
+                        </Button>
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Open Sessions Section */}
         {openSessions.length > 0 && (
           <div className="mb-8">
@@ -257,8 +478,8 @@ const Matches = () => {
           </div>
         )}
 
-        {/* Matches Section */}
-        {Object.keys(matchesBySession).length === 0 ? (
+        {/* No Matches Message */}
+        {Object.keys(matchesBySession).length === 0 && (
           <Card className="p-8 text-center">
             <div className="text-center">
               <div className="text-6xl mb-4">🎯</div>
@@ -271,132 +492,6 @@ const Matches = () => {
               </Button>
             </div>
           </Card>
-        ) : (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Your Matches</h2>
-            
-            {Object.entries(matchesBySession).map(([sessionId, sessionMatches]) => {
-              // Find session details if available
-              const session = sessions.find(s => s.id === sessionId);
-              
-              return (
-                <div key={sessionId} className="mb-8">
-                  {session && (
-                    <div className="mb-4">
-                      <Card className="p-4 bg-gray-50">
-                        <h3 className="text-lg font-semibold">{session.title}</h3>
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-2">
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {new Date(session.scheduled_date).toLocaleDateString()}
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            {session.start_time}
-                          </div>
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            {session.gym_location}
-                          </div>
-                          <div className="flex items-center">
-                            <Dumbbell className="w-4 h-4 mr-1" />
-                            <span className="capitalize">{session.workout_type.replace('_', ' ')}</span>
-                          </div>
-                        </div>
-                      </Card>
-                    </div>
-                  )}
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sessionMatches.map(match => {
-                      const displayName = match.matched_user.first_name && match.matched_user.last_name 
-                        ? `${match.matched_user.first_name} ${match.matched_user.last_name}` 
-                        : match.matched_user.username || 'Unknown User';
-                      const matchPercentage = Math.round((match.match_score || 0.8) * 100);
-                      
-                      return (
-                        <Card key={match.id} className="p-6 hover:shadow-lg transition-all duration-300 hover:scale-105">
-                          <div className="text-center mb-4">
-                            <div className="w-20 h-20 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center text-3xl mx-auto mb-3">
-                              {match.matched_user.avatar_url ? (
-                                <img 
-                                  src={match.matched_user.avatar_url} 
-                                  alt="Avatar" 
-                                  className="w-full h-full rounded-full object-cover" 
-                                />
-                              ) : (
-                                '👤'
-                              )}
-                            </div>
-                            <h3 className="text-xl font-bold">{displayName}</h3>
-                            {match.matched_user.age && <p className="text-muted-foreground">Age {match.matched_user.age}</p>}
-                            <div className="mt-2">
-                              <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                                matchPercentage >= 90 ? 'bg-neon-green/20 text-neon-green' : 
-                                matchPercentage >= 80 ? 'bg-energy-orange/20 text-energy-orange' : 
-                                'bg-electric-blue/20 text-electric-blue'
-                              }`}>
-                                {matchPercentage}% Match
-                              </span>
-                            </div>
-                          </div>
-
-                          {match.matched_user.bio && (
-                            <p className="text-sm text-foreground mb-6 line-clamp-3">
-                              {match.matched_user.bio}
-                            </p>
-                          )}
-
-                          {match.status === 'pending' && (
-                            <div className="flex space-x-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => handleDeny(match.id)} 
-                                className="flex-1 hover:bg-destructive hover:text-destructive-foreground"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => handleChat(match.id)} 
-                                className="flex-1 hover:bg-primary hover:text-primary-foreground"
-                              >
-                                <MessageSquare className="w-4 h-4" />
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                onClick={() => handleAccept(match.id)} 
-                                className="flex-1 gym-gradient text-white hover:scale-105 transition-transform"
-                              >
-                                <Heart className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          )}
-
-                          {match.status === 'accepted' && (
-                            <div className="text-center">
-                              <p className="text-green-600 font-semibold mb-2">✓ Matched!</p>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => handleChat(match.id)} 
-                                className="w-full hover:bg-primary hover:text-primary-foreground"
-                              >
-                                <MessageSquare className="w-4 h-4 mr-2" />
-                                Chat
-                              </Button>
-                            </div>
-                          )}
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         )}
       </div>
     </div>
