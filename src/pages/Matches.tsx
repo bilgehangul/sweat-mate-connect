@@ -5,6 +5,7 @@ import SessionCreator from '@/components/SessionCreator';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Heart, X, MessageSquare, MapPin, Clock, Dumbbell, Plus, Users, Calendar } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useSessionRequests } from '@/hooks/useSessionRequests';
@@ -113,7 +114,7 @@ const Matches = () => {
   // Group matches by session
   const matchesBySession = matches.reduce((acc, match) => {
     const sessionId = match.session_id || 'no-session';
-    if (!acc[session_id]) {
+    if (!acc[sessionId]) {
       acc[sessionId] = [];
     }
     acc[sessionId].push(match);
