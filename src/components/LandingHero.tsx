@@ -244,7 +244,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
       <section className="py-24 bg-white relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-6 leading-tight">
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent mb-2 leading-tight">
               Why Choose GymBuddy?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
