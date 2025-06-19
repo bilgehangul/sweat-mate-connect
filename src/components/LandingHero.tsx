@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Users, Target, Shield, Calendar, Play, Star, ArrowRight, Zap, Heart, Trophy, CheckCircle } from 'lucide-react';
@@ -14,14 +14,18 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
   setCurrentTestimonial((prev) =>
     prev === testimonials.length - 1 ? 0 : prev + 1
   );
+  resetInterval();
 };
 
 const prevTestimonial = () => {
   setCurrentTestimonial((prev) =>
     prev === 0 ? testimonials.length - 1 : prev - 1
   );
+  resetInterval();
 };
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const testimonialIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
 
   const testimonials = [
     {
@@ -46,6 +50,16 @@ const prevTestimonial = () => {
       avatar: "🧘‍♀️"
     }
   ];
+  useEffect(() => {
+  resetInterval();
+  return () => {
+    if (testimonialIntervalRef.current) {
+      clearInterval(testimonialIntervalRef.current);
+    }
+  };
+}, []);
+
+
 
   const features = [
     {
@@ -335,7 +349,10 @@ const prevTestimonial = () => {
                     className={`w-3 h-3 rounded-full transition-all ${
                       index === currentTestimonial ? 'bg-energy-orange' : 'bg-gray-300'
                     }`}
-                    onClick={() => setCurrentTestimonial(index)}
+                    onClick={() => {
+  setCurrentTestimonial(index);
+  resetInterval();
+}}
                   />
                 ))}
               </div>
