@@ -10,6 +10,17 @@ interface LandingHeroProps {
 
 const LandingHero = ({ onSignup }: LandingHeroProps) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+    const nextTestimonial = () => {
+  setCurrentTestimonial((prev) =>
+    prev === testimonials.length - 1 ? 0 : prev + 1
+  );
+};
+
+const prevTestimonial = () => {
+  setCurrentTestimonial((prev) =>
+    prev === 0 ? testimonials.length - 1 : prev - 1
+  );
+};
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const testimonials = [
@@ -105,6 +116,7 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
 
   return (
     <>
@@ -274,7 +286,25 @@ const LandingHero = ({ onSignup }: LandingHeroProps) => {
             <p className="text-xl text-gray-600">Real stories from real people who found their perfect workout partners</p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto relative">
+              {/* Left Arrow */}
+              <button
+                onClick={prevTestimonial}
+                className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl text-gray-400 hover:text-energy-orange z-20 px-2"
+                aria-label="Previous testimonial"
+              >
+                ←
+              </button>
+            
+              {/* Right Arrow */}
+              <button
+                onClick={nextTestimonial}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-3xl text-gray-400 hover:text-electric-blue z-20 px-2"
+                aria-label="Next testimonial"
+              >
+                →
+              </button>
+
             <Card className="p-8 md:p-12 text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-energy-orange to-electric-blue"></div>
               
