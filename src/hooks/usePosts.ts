@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Post {
   id: string;
@@ -22,13 +23,16 @@ interface Post {
 }
 
 export const usePosts = () => {
+  const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (user) {
+      fetchPosts();
+    }
+  }, [user]);
 
   const fetchPosts = async () => {
     try {
@@ -59,13 +63,10 @@ export const usePosts = () => {
 
   const createPost = async (content: string, mediaUrl?: string, mediaType?: 'image' | 'video') => {
     try {
-      // Mock user ID for demo purposes
-      const mockUserId = 'demo-user-id';
-      
       const { error } = await supabase
         .from('posts')
         .insert({
-          author_id: mockUserId,
+          author_id: user?.id,
           content,
           media_url: mediaUrl,
           media_type: mediaType
@@ -86,13 +87,10 @@ export const usePosts = () => {
 
   const likePost = async (postId: string) => {
     try {
-      // Mock user ID for demo purposes
-      const mockUserId = 'demo-user-id';
-      
       // Check if user already liked this post
       const existingLike = posts
         .find(post => post.id === postId)
-        ?.post_likes.find(like => like.user_id === mockUserId);
+        ?.post_likes.find(like => like.user_id === user?.id);
 
       if (existingLike) {
         // Unlike the post
@@ -100,7 +98,7 @@ export const usePosts = () => {
           .from('post_likes')
           .delete()
           .eq('post_id', postId)
-          .eq('user_id', mockUserId);
+          .eq('user_id', user?.id);
 
         if (error) {
           console.error('Error unliking post:', error);
@@ -112,7 +110,7 @@ export const usePosts = () => {
           .from('post_likes')
           .insert({
             post_id: postId,
-            user_id: mockUserId
+            user_id: user?.id
           });
 
         if (error) {
@@ -130,14 +128,11 @@ export const usePosts = () => {
 
   const unlikePost = async (postId: string) => {
     try {
-      // Mock user ID for demo purposes
-      const mockUserId = 'demo-user-id';
-      
       const { error } = await supabase
         .from('post_likes')
         .delete()
         .eq('post_id', postId)
-        .eq('user_id', mockUserId);
+        .eq('user_id', user?.id);
 
       if (error) {
         console.error('Error unliking post:', error);

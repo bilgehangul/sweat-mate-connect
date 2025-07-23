@@ -7,13 +7,16 @@ import { Users, Calendar, MessageCircle, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 const Index = () => {
   const navigate = useNavigate();
-  const handleGetStarted = () => {
-    navigate('/dashboard');
+  const handleSignup = () => {
+    navigate('/signup');
+  };
+  const handleLogin = () => {
+    navigate('/login');
   };
   return <div className="min-h-screen">
-      <Navigation isLoggedIn={false} onGetStarted={handleGetStarted} />
+      <Navigation isLoggedIn={false} onSignup={handleSignup} onLogin={handleLogin} />
       
-      <LandingHero onGetStarted={handleGetStarted} />
+      <LandingHero onSignup={handleSignup} />
       
       {/* How It Works Section */}
       

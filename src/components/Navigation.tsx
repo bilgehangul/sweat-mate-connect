@@ -11,11 +11,12 @@ import {
 
 interface NavigationProps {
   isLoggedIn?: boolean;
-  onGetStarted?: () => void;
+  onSignup?: () => void;
+  onLogin?: () => void;
   onLogout?: () => void;
 }
 
-const Navigation = ({ isLoggedIn = false, onGetStarted, onLogout }: NavigationProps) => {
+const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: NavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.pathname);
@@ -59,11 +60,20 @@ const Navigation = ({ isLoggedIn = false, onGetStarted, onLogout }: NavigationPr
     }
   };
 
-  const handleGetStartedClick = () => {
-    if (onGetStarted) {
-      onGetStarted();
+  const handleSignupClick = () => {
+    if (onSignup) {
+      onSignup();
     } else {
-      navigate('/dashboard');
+      navigate('/signup');
+    }
+    setMobileMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    if (onLogin) {
+      onLogin();
+    } else {
+      navigate('/login');
     }
     setMobileMenuOpen(false);
   };
@@ -112,10 +122,17 @@ const Navigation = ({ isLoggedIn = false, onGetStarted, onLogout }: NavigationPr
           {!isLoggedIn && (
             <div className="hidden md:flex space-x-3">
               <Button 
-                onClick={handleGetStartedClick}
+                variant="outline" 
+                onClick={handleLoginClick}
+                className="border-energy-orange text-energy-orange hover:bg-energy-orange hover:text-pure-white"
+              >
+                Login
+              </Button>
+              <Button 
+                onClick={handleSignupClick}
                 className="gym-gradient text-white energy-glow hover:scale-105 transition-transform pulse-energy"
               >
-                Get Started
+                Sign Up
               </Button>
             </div>
           )}
@@ -169,10 +186,17 @@ const Navigation = ({ isLoggedIn = false, onGetStarted, onLogout }: NavigationPr
               {!isLoggedIn ? (
                 <div className="flex flex-col space-y-2 pt-4 border-t border-energy-orange/20">
                   <Button 
-                    onClick={handleGetStartedClick}
+                    variant="outline" 
+                    onClick={handleLoginClick}
+                    className="border-energy-orange text-energy-orange hover:bg-energy-orange hover:text-pure-white"
+                  >
+                    Login
+                  </Button>
+                  <Button 
+                    onClick={handleSignupClick}
                     className="gym-gradient text-white"
                   >
-                    Get Started
+                    Sign Up
                   </Button>
                 </div>
               ) : (
