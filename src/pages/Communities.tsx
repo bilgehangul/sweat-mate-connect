@@ -112,7 +112,7 @@ const Communities = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {communities.map((community) => {
-              const isOwner = community.creator_id === community.profiles?.id;
+              const isOwner = false; // Placeholder since profile ID is not available
               const isMember = community.is_member;
 
               return (

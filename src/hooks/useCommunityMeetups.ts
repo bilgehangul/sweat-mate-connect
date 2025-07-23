@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
 
 interface CommunityMeetup {
   id: string;
@@ -31,46 +29,9 @@ interface CommunityMeetup {
 }
 
 export const useCommunityMeetups = (communityId: string) => {
-  const { user } = useAuth();
-  const [meetups, setMeetups] = useState<CommunityMeetup[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (communityId) {
-      fetchMeetups();
-    }
-  }, [communityId]);
-
-  const fetchMeetups = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('community_meetups')
-        .select(`
-          *,
-          profiles (first_name, last_name, username, avatar_url),
-          meetup_attendees!left (status)
-        `)
-        .eq('community_id', communityId)
-        .eq('meetup_attendees.user_id', user?.id)
-        .order('event_date', { ascending: true });
-
-      if (error) throw error;
-      
-      const meetupsWithAttendance = data?.map(meetup => ({
-        ...meetup,
-        user_attendance: meetup.meetup_attendees?.[0] || null
-      })) || [];
-
-      setMeetups(meetupsWithAttendance);
-    } catch (err: any) {
-      console.error('Error fetching meetups:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [meetups] = useState<CommunityMeetup[]>([]);
+  const [loading] = useState(false);
+  const [error] = useState<string | null>(null);
 
   const createMeetup = async (meetupData: {
     title: string;
@@ -84,55 +45,19 @@ export const useCommunityMeetups = (communityId: string) => {
     is_virtual?: boolean;
     meeting_link?: string;
   }) => {
-    try {
-      const { error } = await supabase
-        .from('community_meetups')
-        .insert({
-          ...meetupData,
-          community_id: communityId,
-          organizer_id: user?.id
-        });
-
-      if (error) throw error;
-      await fetchMeetups();
-    } catch (err: any) {
-      console.error('Error creating meetup:', err);
-      throw err;
-    }
+    throw new Error('Community meetups feature not available yet');
   };
 
   const joinMeetup = async (meetupId: string, status: 'attending' | 'maybe' | 'not_attending' = 'attending') => {
-    try {
-      const { error } = await supabase
-        .from('meetup_attendees')
-        .upsert({
-          meetup_id: meetupId,
-          user_id: user?.id,
-          status
-        });
-
-      if (error) throw error;
-      await fetchMeetups();
-    } catch (err: any) {
-      console.error('Error joining meetup:', err);
-      throw err;
-    }
+    throw new Error('Community meetups feature not available yet');
   };
 
   const leaveMeetup = async (meetupId: string) => {
-    try {
-      const { error } = await supabase
-        .from('meetup_attendees')
-        .delete()
-        .eq('meetup_id', meetupId)
-        .eq('user_id', user?.id);
+    throw new Error('Community meetups feature not available yet');
+  };
 
-      if (error) throw error;
-      await fetchMeetups();
-    } catch (err: any) {
-      console.error('Error leaving meetup:', err);
-      throw err;
-    }
+  const refetch = async () => {
+    // No-op
   };
 
   return {
@@ -142,6 +67,6 @@ export const useCommunityMeetups = (communityId: string) => {
     createMeetup,
     joinMeetup,
     leaveMeetup,
-    refetch: fetchMeetups
+    refetch
   };
 };

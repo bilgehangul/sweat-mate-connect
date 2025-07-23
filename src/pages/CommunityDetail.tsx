@@ -60,13 +60,8 @@ const CommunityDetail = () => {
 
       if (communityError) throw communityError;
 
-      // Then, separately fetch the community settings
-      const { data: settingsData, error: settingsError } = await supabase
-        .from('community_settings')
-        .select('*')
-        .eq('community_id', id);
-
-      if (settingsError) throw settingsError;
+      // Community settings feature not implemented yet
+      const settingsData = null;
 
       // Combine the results
       const combinedData = {
