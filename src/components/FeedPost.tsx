@@ -1,7 +1,9 @@
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageSquare } from 'lucide-react';
+import { Heart, MessageSquare, Share, Play } from 'lucide-react';
+import { usePosts } from '@/hooks/usePosts';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface FeedPostProps {
   post: {
@@ -10,13 +12,42 @@ interface FeedPostProps {
     avatar: string;
     time: string;
     content: string;
-    workout: string;
+    workout?: string;
+    media?: {
+      type: string;
+      url: string;
+      thumbnail?: string;
+    };
     likes: number;
     comments: number;
+    isLiked?: boolean;
+    postLikes?: { id: string; user_id: string }[];
   };
 }
 
 const FeedPost = ({ post }: FeedPostProps) => {
+  const { likePost } = usePosts();
+  const { user } = useAuth();
+
+  // Check if current user has liked this post
+  const isLiked = post.postLikes?.some(like => like.user_id === user?.id) || false;
+
+  const handleLike = async () => {
+    try {
+      await likePost(post.id.toString());
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
+
+  const handleComment = () => {
+    console.log('Comment on post:', post.id);
+  };
+
+  const handleShare = () => {
+    console.log('Share post:', post.id);
+  };
+
   return (
     <Card className="p-6 mb-4 hover:shadow-lg transition-shadow">
       <div className="flex items-start space-x-4">
@@ -33,6 +64,35 @@ const FeedPost = ({ post }: FeedPostProps) => {
           
           <p className="text-foreground mb-3">{post.content}</p>
           
+          {/* Media Content */}
+          {post.media && (
+            <div className="mb-3 rounded-lg overflow-hidden">
+              {post.media.type === 'image' ? (
+                <img 
+                  src={post.media.url} 
+                  alt="Post media"
+                  className="w-full max-h-96 object-cover hover:scale-105 transition-transform cursor-pointer"
+                />
+              ) : post.media.type === 'video' ? (
+                <div className="relative">
+                  <img 
+                    src={post.media.thumbnail || '/placeholder.svg'} 
+                    alt="Video thumbnail"
+                    className="w-full max-h-96 object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <Button 
+                      size="lg" 
+                      className="rounded-full gym-gradient text-white hover:scale-110 transition-transform"
+                    >
+                      <Play className="w-6 h-6 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          )}
+          
           {post.workout && (
             <div className="bg-gradient-to-r from-energy-orange/10 to-electric-blue/10 rounded-lg p-3 mb-3">
               <p className="text-sm font-medium text-primary">🏋️ {post.workout}</p>
@@ -40,13 +100,36 @@ const FeedPost = ({ post }: FeedPostProps) => {
           )}
           
           <div className="flex items-center space-x-6">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
-              <Heart className="w-4 h-4 mr-1" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleLike}
+              className={`transition-colors ${
+                isLiked 
+                  ? 'text-red-500 hover:text-red-600' 
+                  : 'text-muted-foreground hover:text-red-500'
+              }`}
+            >
+              <Heart className={`w-4 h-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
               {post.likes}
             </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleComment}
+              className="text-muted-foreground hover:text-primary"
+            >
               <MessageSquare className="w-4 h-4 mr-1" />
               {post.comments}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleShare}
+              className="text-muted-foreground hover:text-primary"
+            >
+              <Share className="w-4 h-4 mr-1" />
+              Share
             </Button>
           </div>
         </div>
