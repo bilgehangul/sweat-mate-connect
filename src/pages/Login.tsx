@@ -63,7 +63,12 @@ const Login = () => {
   const handleDemoLogin = async () => {
     setLoading(true);
     const { error } = await signInAnonymously();
-    
+      // Use a demo account instead of anonymous authentication
+      const { error } = await supabase.auth.signInWithPassword({
+        email: 'demo@sweatmate.com',
+        password: 'demo123456'
+      });
+      
     if (error) {
       toast({
         title: "Demo Login Failed",
