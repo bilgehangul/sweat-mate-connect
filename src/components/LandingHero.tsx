@@ -5,10 +5,10 @@ import { Users, Target, Shield, Calendar, Play, Star, ArrowRight, Zap, Heart, Tr
 import Footer from './Footer';
 
 interface LandingHeroProps {
-  onSignup: () => void;
+  onGetStarted: () => void;
 }
 
-const LandingHero = ({ onSignup }: LandingHeroProps) => {
+const LandingHero = ({ onGetStarted }: LandingHeroProps) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
     const nextTestimonial = () => {
   setCurrentTestimonial((prev) =>
@@ -176,7 +176,7 @@ const prevTestimonial = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <Button 
-                    onClick={onSignup}
+                    onClick={onGetStarted}
                     size="lg"
                     className="text-xl px-8 py-6 bg-white text-energy-orange hover:bg-gray-100 hover:scale-105 transition-all duration-300 font-bold rounded-full shadow-2xl group"
                   >
@@ -356,7 +356,7 @@ const prevTestimonial = () => {
   setCurrentTestimonial(index);
   resetInterval();
 }}
-                  />
+              <Button onClick={onGetStarted} className="gym-gradient text-white">
                 ))}
               </div>
             </Card>
@@ -423,7 +423,7 @@ const prevTestimonial = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Button 
-              onClick={onSignup}
+              onClick={onGetStarted}
               size="lg"
               className="text-xl px-12 py-6 bg-white text-energy-orange hover:bg-gray-100 hover:scale-105 transition-all duration-300 font-bold rounded-full shadow-2xl"
             >

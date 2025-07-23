@@ -9,11 +9,9 @@ import CreatePostForm from '@/components/CreatePostForm';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, X, Plus } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
 import { usePosts } from '@/hooks/usePosts';
 
 const Dashboard = () => {
-  const { signOut } = useAuth();
   const { posts, loading: postsLoading } = usePosts();
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -29,8 +27,8 @@ const Dashboard = () => {
     setSelectedBuddy(null);
   };
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    // No authentication to handle
   };
 
   return (
