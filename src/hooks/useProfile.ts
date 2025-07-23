@@ -49,13 +49,28 @@ export const useProfile = () => {
         console.error('Error fetching profile:', error);
         setError(error.message);
       } else {
-        // Add missing date_of_birth property for compatibility
-        const profileWithDateOfBirth = {
-          ...data,
-          date_of_birth: null // Adding missing property with default value
-        };
+        // Calculate age from date_of_birth if available
+        let calculatedAge = data.age;
+        if (data.date_of_birth && !data.age) {
+          const birthDate = new Date(data.date_of_birth);
+          const today = new Date();
+          calculatedAge = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            calculatedAge--;
+          }
+          
+          // Update the profile with calculated age
+          if (calculatedAge !== data.age) {
+            await supabase
+              .from('profiles')
+              .update({ age: calculatedAge })
+              .eq('id', user?.id);
+            data.age = calculatedAge;
+          }
+        }
         
-        setProfile(profileWithDateOfBirth);
+        setProfile(data);
       }
     } catch (err) {
       console.error('Error fetching profile:', err);
