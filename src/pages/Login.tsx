@@ -10,7 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { signIn, signInWithGoogle, user } = useAuth();
+  const { signIn, signInWithGoogle, signInAnonymously, user } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,6 +55,27 @@ const Login = () => {
         description: error.message,
         variant: "destructive",
       });
+    }
+    
+    setLoading(false);
+  };
+
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    const { error } = await signInAnonymously();
+    
+    if (error) {
+      toast({
+        title: "Demo Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Welcome to the demo!",
+        description: "You can now explore the app.",
+      });
+      navigate('/dashboard');
     }
     
     setLoading(false);
@@ -143,6 +164,16 @@ const Login = () => {
               />
             </svg>
             Continue with Google
+          </Button>
+
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="w-full mt-4"
+          >
+            🚀 Try Demo (No Signup Required)
           </Button>
         </div>
 

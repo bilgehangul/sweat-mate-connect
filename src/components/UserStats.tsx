@@ -24,8 +24,9 @@ const UserStats = () => {
     );
   }
 
-  const workoutStats = getWorkoutStats();
-  const averageRating = getAverageRating();
+  // Placeholder stats since features are not implemented yet
+  const workoutStats = { totalWorkouts: 0, totalMinutes: 0, totalCalories: 0, averageRating: 0 };
+  const averageRating = 0;
 
   const statsData = [
     {
@@ -42,7 +43,7 @@ const UserStats = () => {
     },
     {
       label: 'Hours Exercised',
-      value: `${Math.floor((workoutStats.totalDuration || 0) / 60)}h ${(workoutStats.totalDuration || 0) % 60}m`,
+      value: `${Math.floor((workoutStats.totalMinutes || 0) / 60)}h ${(workoutStats.totalMinutes || 0) % 60}m`,
       icon: <Clock className="w-4 h-4 fill-current" />,
       color: 'text-electric-blue'
     },
