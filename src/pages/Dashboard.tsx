@@ -15,8 +15,13 @@ const Dashboard = () => {
       time: '2 hours ago',
       content: 'Just crushed a deadlift PR! 225lbs 💪 Looking for someone to celebrate with tomorrow at Gold\'s Gym!',
       workout: 'Strength Training - 90 minutes',
+      media: {
+        type: 'image' as const,
+        url: '/placeholder.svg'
+      },
       likes: 12,
-      comments: 3
+      comments: 3,
+      isLiked: false
     },
     {
       id: 2,
@@ -25,8 +30,14 @@ const Dashboard = () => {
       time: '4 hours ago',
       content: 'Morning cardio session complete! The sunrise run was incredible. Who\'s up for a 6am session tomorrow?',
       workout: 'Cardio - 45 minutes',
+      media: {
+        type: 'video' as const,
+        url: '/placeholder-video.mp4',
+        thumbnail: '/placeholder.svg'
+      },
       likes: 8,
-      comments: 5
+      comments: 5,
+      isLiked: true
     },
     {
       id: 3,
@@ -36,7 +47,8 @@ const Dashboard = () => {
       content: 'First time trying CrossFit and I\'m officially addicted! Special thanks to Alex for being an amazing workout partner 🙌',
       workout: 'CrossFit - 60 minutes',
       likes: 15,
-      comments: 7
+      comments: 7,
+      isLiked: false
     }
   ]);
 
