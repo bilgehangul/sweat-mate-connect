@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import Navigation from '@/components/Navigation';
 import ProfileEditForm from '@/components/ProfileEditForm';
 import SessionCreator from '@/components/SessionCreator';
-import WorkoutSessionList from '@/components/WorkoutSessionList';
 import GymBuddiesList from '@/components/GymBuddiesList';
 import UserStats from '@/components/UserStats';
 import WorkoutHistory from '@/components/WorkoutHistory';
@@ -170,17 +170,12 @@ const Profile = () => {
           <UserStats />
 
           {/* Tabs Section */}
-          <Tabs defaultValue="sessions" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="sessions">Workout Sessions</TabsTrigger>
+          <Tabs defaultValue="history" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="history">Workout History</TabsTrigger>
               <TabsTrigger value="posts">Posts</TabsTrigger>
               <TabsTrigger value="buddies">Gym Buddies</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="sessions" className="space-y-6">
-              <WorkoutSessionList onCreateSession={() => setShowSessionCreator(true)} />
-            </TabsContent>
             
             <TabsContent value="history" className="space-y-6">
               <WorkoutHistory />

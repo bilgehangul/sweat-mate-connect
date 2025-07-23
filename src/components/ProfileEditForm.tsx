@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +23,7 @@ const ProfileEditForm = ({ onClose }: ProfileEditFormProps) => {
     last_name: profile?.last_name || '',
     username: profile?.username || '',
     bio: profile?.bio || '',
-    date_of_birth: profile?.date_of_birth || '',
+    age: profile?.age?.toString() || '',
     gender: profile?.gender || '',
     location: profile?.location || '',
     favorite_gym: profile?.favorite_gym || '',
@@ -42,6 +43,7 @@ const ProfileEditForm = ({ onClose }: ProfileEditFormProps) => {
     try {
       await updateProfile({
         ...formData,
+        age: formData.age ? parseInt(formData.age) : null,
         workout_goals: workoutGoals,
         workout_preferences: workoutPreferences,
       });
@@ -135,12 +137,12 @@ const ProfileEditForm = ({ onClose }: ProfileEditFormProps) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Date of Birth</label>
+            <label className="block text-sm font-medium mb-2">Age</label>
             <Input
-              type="date"
-              value={formData.date_of_birth}
-              onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-              max={new Date().toISOString().split('T')[0]}
+              type="number"
+              value={formData.age}
+              onChange={(e) => setFormData({...formData, age: e.target.value})}
+              placeholder="Age"
             />
           </div>
           <div>

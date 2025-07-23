@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Users, Menu, X, LogOut, User, Settings, CreditCard, Bell } from 'lucide-react';
+import { Users, Menu, X, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/contexts/AuthContext';
-import { useProfile } from '@/hooks/useProfile';
 
 interface NavigationProps {
   isLoggedIn?: boolean;
@@ -23,8 +19,6 @@ interface NavigationProps {
 const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: NavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
-  const { profile } = useProfile();
   const [activeTab, setActiveTab] = useState(location.pathname);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -90,53 +84,6 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
     }
   };
 
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
-
-  const handleSettingsClick = () => {
-    // TODO: Navigate to settings page when implemented
-    console.log('Settings clicked');
-  };
-
-  const handleBillingClick = () => {
-    // TODO: Navigate to billing page when implemented
-    console.log('Billing clicked');
-  };
-
-  const handleNotificationsClick = () => {
-    // TODO: Navigate to notifications page when implemented
-    console.log('Notifications clicked');
-  };
-
-  // Get display name for the user
-  const getDisplayName = () => {
-    if (profile?.first_name && profile?.last_name) {
-      return `${profile.first_name} ${profile.last_name}`;
-    }
-    if (profile?.username) {
-      return profile.username;
-    }
-    if (user?.email) {
-      return user.email.split('@')[0];
-    }
-    return 'User';
-  };
-
-  // Get user initials for avatar
-  const getUserInitials = () => {
-    if (profile?.first_name && profile?.last_name) {
-      return `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase();
-    }
-    if (profile?.username) {
-      return profile.username.slice(0, 2).toUpperCase();
-    }
-    if (user?.email) {
-      return user.email.slice(0, 2).toUpperCase();
-    }
-    return 'U';
-  };
-
   return (
     <nav className="bg-jet-black/95 backdrop-blur-sm border-b border-energy-orange/20 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -194,52 +141,12 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
             <div className="hidden md:flex items-center space-x-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex items-center space-x-3 cursor-pointer hover:bg-white/10 rounded-lg p-2 transition-colors">
-                    <div className="w-8 h-8 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center">
-                      {profile?.avatar_url ? (
-                        <img 
-                          src={profile.avatar_url} 
-                          alt="Profile" 
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-white text-sm font-bold">
-                          {getUserInitials()}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium text-pure-white text-sm">
-                        {getDisplayName()}
-                      </div>
-                      {profile?.username && (
-                        <div className="text-xs text-gray-300">
-                          @{profile.username}
-                        </div>
-                      )}
-                    </div>
+                  <div className="flex items-center space-x-2 cursor-pointer">
+                    <div className="w-8 h-8 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full"></div>
+                    <span className="font-medium text-pure-white">John Doe</span>
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleProfileClick}>
-                    <User className="w-4 h-4 mr-2" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleSettingsClick}>
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleNotificationsClick}>
-                    <Bell className="w-4 h-4 mr-2" />
-                    Notifications
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleBillingClick}>
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleLogoutClick}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
@@ -293,67 +200,7 @@ const Navigation = ({ isLoggedIn = false, onSignup, onLogin, onLogout }: Navigat
                   </Button>
                 </div>
               ) : (
-                <div className="pt-4 border-t border-energy-orange/20 space-y-2">
-                  {/* Mobile User Info */}
-                  <div className="flex items-center space-x-3 p-2">
-                    <div className="w-8 h-8 bg-gradient-to-r from-energy-orange to-electric-blue rounded-full flex items-center justify-center">
-                      {profile?.avatar_url ? (
-                        <img 
-                          src={profile.avatar_url} 
-                          alt="Profile" 
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-white text-sm font-bold">
-                          {getUserInitials()}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-medium text-pure-white text-sm">
-                        {getDisplayName()}
-                      </div>
-                      {profile?.username && (
-                        <div className="text-xs text-gray-300">
-                          @{profile.username}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Mobile Menu Items */}
-                  <Button 
-                    variant="ghost"
-                    onClick={handleProfileClick}
-                    className="w-full justify-start text-pure-white hover:bg-white/10"
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    Profile
-                  </Button>
-                  <Button 
-                    variant="ghost"
-                    onClick={handleSettingsClick}
-                    className="w-full justify-start text-pure-white hover:bg-white/10"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </Button>
-                  <Button 
-                    variant="ghost"
-                    onClick={handleNotificationsClick}
-                    className="w-full justify-start text-pure-white hover:bg-white/10"
-                  >
-                    <Bell className="w-4 h-4 mr-2" />
-                    Notifications
-                  </Button>
-                  <Button 
-                    variant="ghost"
-                    onClick={handleBillingClick}
-                    className="w-full justify-start text-pure-white hover:bg-white/10"
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Billing
-                  </Button>
+                <div className="pt-4 border-t border-energy-orange/20">
                   <Button 
                     onClick={handleLogoutClick}
                     variant="outline"

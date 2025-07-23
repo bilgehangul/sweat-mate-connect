@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,8 +28,7 @@ const SessionCreator = ({ onCreateSession }: SessionCreatorProps) => {
     start_time: '',
     end_time: '',
     workout_type: '',
-    max_participants: 2,
-    matching_groups: 'everyone'
+    max_participants: 2
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,8 +58,7 @@ const SessionCreator = ({ onCreateSession }: SessionCreatorProps) => {
         start_time: '',
         end_time: '',
         workout_type: '',
-        max_participants: 2,
-        matching_groups: 'everyone'
+        max_participants: 2
       });
     } catch (error: any) {
       toast({
@@ -195,37 +194,6 @@ const SessionCreator = ({ onCreateSession }: SessionCreatorProps) => {
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <div>
-          <Label htmlFor="matching_groups">Match With</Label>
-          <Select value={formData.matching_groups} onValueChange={(value) => setFormData({...formData, matching_groups: value})}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select who to match with" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="everyone">Everyone</SelectItem>
-              <SelectItem value="all_communities">All My Communities</SelectItem>
-              <SelectItem value="specific_community">Specific Community</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          {formData.matching_groups === 'specific_community' && (
-            <div className="mt-2">
-              <Label htmlFor="community_id">Select Community</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a community" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="placeholder">Loading communities...</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-1">
-                Only members of this community will be matched with your session
-              </p>
-            </div>
-          )}
         </div>
         
         <div className="flex space-x-3 pt-4">
