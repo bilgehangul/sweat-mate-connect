@@ -56,8 +56,7 @@ export default {
 				'energy-orange': 'hsl(var(--energy-orange))',
 				'electric-blue': 'hsl(var(--electric-blue))',
 				'neon-green': 'hsl(var(--neon-green))',
-				'jet-black': 'hsl(var(--jet-black))',
-				'pure-white': 'hsl(var(--pure-white))',
+				'dark-slate': 'hsl(var(--dark-slate))',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

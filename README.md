@@ -1,22 +1,40 @@
-## What is Sweat Mate?
-Sweat Mate (need to find a better name) is a web app that allows gym rats to create personal profiles, create workout sessions, and match with other gym rats who have matching sessions.
+# Welcome to your Lovable project
 
-It is also a great app for people to socialize more with the gym community. Users can create their own communities, create meetups, and post photos from their gym sessions.
+## Project info
 
-(Still building the app, so stay tuned!)
+**URL**: https://lovable.dev/projects/9c6172af-c07a-4c0c-92b9-cfc1bffb31e5
 
+## How can I edit this code?
 
-## What technologies are used for this project?
+There are several ways of editing your application.
 
-This project is built with:
+**Use Lovable**
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Simply visit the [Lovable Project](https://lovable.dev/projects/9c6172af-c07a-4c0c-92b9-cfc1bffb31e5) and start prompting.
 
+Changes made via Lovable will be committed automatically to this repo.
 
+**Use your preferred IDE**
+
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+Follow these steps:
+
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
+
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
+
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
+```
 
 **Edit a file directly in GitHub**
 
@@ -31,3 +49,25 @@ This project is built with:
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+## How can I deploy this project?
+
+Simply open [Lovable](https://lovable.dev/projects/9c6172af-c07a-4c0c-92b9-cfc1bffb31e5) and click on Share -> Publish.
+
+## Can I connect a custom domain to my Lovable project?
+
+Yes, you can!
+
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

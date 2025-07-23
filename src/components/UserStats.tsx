@@ -1,56 +1,38 @@
+
 import { Card } from '@/components/ui/card';
-import { Heart, Dumbbell, Star, Clock } from 'lucide-react';
-import { useUserStats } from '@/hooks/useUserStats';
-import { useGymBuddies } from '@/hooks/useGymBuddies';
-import { useWorkoutLogs } from '@/hooks/useWorkoutLogs';
-import { useWorkoutReviews } from '@/hooks/useWorkoutReviews';
+import { Heart } from 'lucide-react';
 
 const UserStats = () => {
-  const { stats, loading: statsLoading } = useUserStats();
-  const { buddies, loading: buddiesLoading } = useGymBuddies();
-  const { getWorkoutStats, loading: logsLoading } = useWorkoutLogs();
-  const { getAverageRating, loading: reviewsLoading } = useWorkoutReviews();
-
-  if (statsLoading || buddiesLoading || logsLoading || reviewsLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded mb-4"></div>
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-20 bg-gray-200 rounded mb-4"></div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  const workoutStats = getWorkoutStats();
-  const averageRating = getAverageRating();
-
-  const statsData = [
+  const stats = [
     {
       label: 'Workouts Completed',
-      value: workoutStats.totalWorkouts || 0,
-      icon: <Dumbbell className="w-4 h-4 fill-current" />,
+      value: '127',
+      icon: '💪',
       color: 'text-energy-orange'
     },
     {
-      label: 'User Rating',
-      value: averageRating > 0 ? `${averageRating}/5` : 'No ratings',
-      icon: <Star className="w-4 h-4 fill-current" />,
+      label: 'Ranking',
+      value: '4/5',
+      icon: '⭐',
       color: 'text-yellow-500'
     },
     {
       label: 'Hours Exercised',
-      value: `${Math.floor((workoutStats.totalDuration || 0) / 60)}h ${(workoutStats.totalDuration || 0) % 60}m`,
-      icon: <Clock className="w-4 h-4 fill-current" />,
+      value: '89h 32m',
+      icon: '⏱️',
       color: 'text-electric-blue'
     },
     {
-      label: 'Gym Buddies',
-      value: buddies?.length || 0,
+      label: 'Favorite Buddies',
+      value: '12',
       icon: <Heart className="w-4 h-4 fill-current" />,
       color: 'text-red-500'
+    },
+    {
+      label: 'Gym Rat Level',
+      value: 'Level 23',
+      icon: '🏆',
+      color: 'text-neon-green'
     }
   ];
 
@@ -60,14 +42,14 @@ const UserStats = () => {
         Your Stats
       </h2>
       
-      {statsData.map((stat, index) => (
+      {stats.map((stat, index) => (
         <Card key={stat.label} className="p-4 hover:shadow-lg transition-shadow border-l-4 border-l-primary">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
               <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
             </div>
-            <div className={`text-2xl ${stat.color}`}>{stat.icon}</div>
+            <div className="text-2xl">{stat.icon}</div>
           </div>
         </Card>
       ))}

@@ -1,125 +1,82 @@
 
 import { useState } from 'react';
 import Navigation from '@/components/Navigation';
+import UserStats from '@/components/UserStats';
+import SessionCreator from '@/components/SessionCreator';
 import GymBuddiesList from '@/components/GymBuddiesList';
 import FeedPost from '@/components/FeedPost';
-import UserStats from '@/components/UserStats';
-import Chat from '@/components/Chat';
-import CreatePostForm from '@/components/CreatePostForm';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MessageCircle, X, Plus } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { usePosts } from '@/hooks/usePosts';
 
 const Dashboard = () => {
-  const { signOut } = useAuth();
-  const { posts, loading: postsLoading } = usePosts();
-  const [showCreatePost, setShowCreatePost] = useState(false);
-  const [showChat, setShowChat] = useState(false);
-  const [selectedBuddy, setSelectedBuddy] = useState<any>(null);
+  const [posts] = useState([
+    {
+      id: 1,
+      user: 'Sarah Chen',
+      avatar: '👩‍💼',
+      time: '2 hours ago',
+      content: 'Just crushed a deadlift PR! 225lbs 💪 Looking for someone to celebrate with tomorrow at Gold\'s Gym!',
+      workout: 'Strength Training - 90 minutes',
+      likes: 12,
+      comments: 3
+    },
+    {
+      id: 2,
+      user: 'Mike Rodriguez',
+      avatar: '👨‍💼',
+      time: '4 hours ago',
+      content: 'Morning cardio session complete! The sunrise run was incredible. Who\'s up for a 6am session tomorrow?',
+      workout: 'Cardio - 45 minutes',
+      likes: 8,
+      comments: 5
+    },
+    {
+      id: 3,
+      user: 'Emma Wilson',
+      avatar: '👩‍🎓',
+      time: '1 day ago',
+      content: 'First time trying CrossFit and I\'m officially addicted! Special thanks to Alex for being an amazing workout partner 🙌',
+      workout: 'CrossFit - 60 minutes',
+      likes: 15,
+      comments: 7
+    }
+  ]);
 
-  const handleChatClick = (buddy: any) => {
-    setSelectedBuddy(buddy);
-    setShowChat(true);
-  };
-
-  const handleCloseChat = () => {
-    setShowChat(false);
-    setSelectedBuddy(null);
-  };
-
-  const handleLogout = async () => {
-    await signOut();
+  const handleCreateSession = (sessionData: any) => {
+    console.log('Creating session:', sessionData);
+    // Here you would typically send this to your backend
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <Navigation isLoggedIn={true} onLogout={handleLogout} />
+    <div className="min-h-screen bg-background">
+      <Navigation isLoggedIn={true} />
       
-      {/* Create Post Modal */}
-      {showCreatePost && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <CreatePostForm onClose={() => setShowCreatePost(false)} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Sidebar - User Stats */}
           <div className="lg:col-span-1">
             <UserStats />
           </div>
-
-          {/* Center - Main Feed */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Create Post Button */}
-            <div className="text-center">
-              <Button 
-                onClick={() => setShowCreatePost(true)}
-                size="lg"
-                className="gym-gradient text-white energy-glow hover:scale-105 transition-transform px-8 py-4 text-lg font-semibold rounded-full"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                CREATE A POST
-              </Button>
-            </div>
-
-            {/* Feed Posts */}
-            <div className="space-y-6">
-              {postsLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-energy-orange mx-auto"></div>
-                  <p className="text-muted-foreground mt-2">Loading posts...</p>
-                </div>
-              ) : posts.length > 0 ? (
-                posts.map((post) => (
-                  <FeedPost 
-                    key={post.id} 
-                    post={{
-                      id: parseInt(post.id),
-                      user: `${post.profiles.first_name || ''} ${post.profiles.last_name || ''}`.trim() || post.profiles.username || 'Unknown User',
-                      avatar: post.profiles.avatar_url || '👤',
-                      time: new Date(post.created_at).toLocaleDateString(),
-                      content: post.content,
-                      likes: post.post_likes.length,
-                      comments: post.post_comments.length,
-                      ...(post.media_url && { media: { type: post.media_type as 'image' | 'video', url: post.media_url } })
-                    }} 
-                  />
-                ))
-              ) : (
-                <Card className="p-6 text-center">
-                  <h3 className="text-lg font-bold mb-2">Welcome to GymBuddy!</h3>
-                  <p className="text-muted-foreground mb-4">No posts yet. Be the first to share your fitness journey!</p>
-                  <Button onClick={() => setShowCreatePost(true)} className="gym-gradient text-white">
-                    Create Your First Post
-                  </Button>
-                </Card>
-              )}
+          
+          {/* Main Content Area */}
+          <div className="lg:col-span-2">
+            <SessionCreator onCreateSession={handleCreateSession} />
+            
+            {/* Feed */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-energy-orange to-electric-blue bg-clip-text text-transparent">
+                Your Feed
+              </h2>
+              {posts.map((post) => (
+                <FeedPost key={post.id} post={post} />
+              ))}
             </div>
           </div>
-
+          
           {/* Right Sidebar - Gym Buddies */}
           <div className="lg:col-span-1">
             <GymBuddiesList />
           </div>
         </div>
       </div>
-
-      {/* Chat Overlay */}
-      {showChat && selectedBuddy && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-lg w-full max-w-md h-[600px] flex flex-col">
-            <Chat buddy={selectedBuddy} onClose={handleCloseChat} isOpen={showChat} />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
