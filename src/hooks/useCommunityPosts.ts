@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CommunityPost {
   id: string;
@@ -19,24 +21,88 @@ interface CommunityPost {
 }
 
 export const useCommunityPosts = (communityId: string) => {
-  const [posts] = useState<CommunityPost[]>([]);
-  const [loading] = useState(false);
-  const [error] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (communityId) {
+      fetchPosts();
+    }
+  }, [communityId]);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('community_posts')
+        .select(`
+          *,
+          profiles (first_name, last_name, username, avatar_url)
+        `)
+        .eq('community_id', communityId)
+        .order('is_pinned', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPosts(data || []);
+    } catch (err: any) {
+      console.error('Error fetching community posts:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const createPost = async (content: string, mediaUrl?: string, mediaType?: 'image' | 'video') => {
-    throw new Error('Community posts feature not available yet');
+    try {
+      const { error } = await supabase
+        .from('community_posts')
+        .insert({
+          community_id: communityId,
+          author_id: user?.id,
+          content,
+          media_url: mediaUrl,
+          media_type: mediaType
+        });
+
+      if (error) throw error;
+      await fetchPosts();
+    } catch (err: any) {
+      console.error('Error creating post:', err);
+      throw err;
+    }
   };
 
   const deletePost = async (postId: string) => {
-    throw new Error('Community posts feature not available yet');
+    try {
+      const { error } = await supabase
+        .from('community_posts')
+        .delete()
+        .eq('id', postId);
+
+      if (error) throw error;
+      await fetchPosts();
+    } catch (err: any) {
+      console.error('Error deleting post:', err);
+      throw err;
+    }
   };
 
   const pinPost = async (postId: string, isPinned: boolean) => {
-    throw new Error('Community posts feature not available yet');
-  };
+    try {
+      const { error } = await supabase
+        .from('community_posts')
+        .update({ is_pinned: isPinned })
+        .eq('id', postId);
 
-  const refetch = async () => {
-    // No-op
+      if (error) throw error;
+      await fetchPosts();
+    } catch (err: any) {
+      console.error('Error updating post pin status:', err);
+      throw err;
+    }
   };
 
   return {
@@ -46,6 +112,6 @@ export const useCommunityPosts = (communityId: string) => {
     createPost,
     deletePost,
     pinPost,
-    refetch
+    refetch: fetchPosts
   };
 };
