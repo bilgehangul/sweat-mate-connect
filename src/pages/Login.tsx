@@ -25,13 +25,12 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     const { error } = await signIn(email, password);
     
     if (error) {
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: signInError.message || "An unknown error occurred.",
         variant: "destructive",
       });
     } else {
@@ -52,7 +51,7 @@ const Login = () => {
     if (error) {
       toast({
         title: "Google Login Failed",
-        description: error.message,
+        description: error.message || "An unknown error occurred.",
         variant: "destructive",
       });
     }
